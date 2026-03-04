@@ -29,7 +29,7 @@ module fetch_stage (
     logic [31:0] saved_instruction = 0;
 
     logic [1:0] saved = 0;
-    logic [1:0] after_reset = 0;
+    logic [1:0] finished_reset = 0;
 
     logic [2:0] curr_fetch_status = fetch_status.STAGE_INIT;
     logic [2:0] curr_wb_status;
@@ -53,6 +53,10 @@ module fetch_stage (
 
     end
 
+    // TODO: change enum to typedef
+    // check if finished_reset makes sense
+
+
 
     // Notes for myself:
 
@@ -73,15 +77,16 @@ module fetch_stage (
             curr_fetch_status <= fetch_status.STAGE_RST;
             wb.cyc <= 0;
             wb.stb <= 0;
+            finished_reset <= 0;
             //TODO: maybe add here forwarding state? Bubble?
         end
         else begin
 
-            if (status_backwards_in == pipeline_status::JUMP) begin
+            if (status_backwards_in == pipeline_status::JUMP && finished_reset) begin
                 wb.adr <= jump_address_backwards_in >> 2;
                 pc <= jump_address_backwards_in;
             end
-            else begin
+            else if (finished_reset) begin
                 wb.adr <= pc >> 2;
             end
 
@@ -94,10 +99,10 @@ module fetch_stage (
                 STAGE_FETCH: begin
                     if (wb.err == 1) begin
                         status_forwards_out <= pipeline_status::FETCH_FAULT;
+                        finished_reset <= 1;
                         // at this sage, retry read? pc to next instruction?
                     end
                     else if (wb.ack == 1) begin
-                        curr_fetch_status <= fetch_status.STAGE_HOLD;
                         saved_instruction <= wb.dat_miso; // miso = read!
 
                         // could this be a timing problem if it's set at this clock cycle?
@@ -105,9 +110,18 @@ module fetch_stage (
 
                         // imagine, if we're ready, go fetch the next instruction and store the current. In case a JUMP is issued, clean our registers and read again. This time, fetch would be faster?
                         instruction_reg_out <= saved_instruction;
-                        status_forwards_out <= pipeline_status::VALID;
-                        wb.cyc <= 0;
-                        wb.stb <= 0;
+
+                        if (status_backwards_in == pipeline_status::READY) begin
+                            curr_fetch_status <= fetch_status.STAGE_FETCH;
+                            status_forwards_out <= pipeline_status::BUBBLE;
+                            pc <= pc + 4;
+                        end
+                        else begin
+                            curr_fetch_status <= fetch_status.STAGE_HOLD;
+                            status_forwards_out <= pipeline_status::VALID;
+                            wb.cyc <= 0;
+                            wb.stb <= 0;
+                        end
                     end
                 end
                 STAGE_HOLD: begin
