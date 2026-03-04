@@ -12,13 +12,14 @@
 > ### 🛠️ My Implementation Progress
 > *Below is the live status of the modules I am actively writing in the `rtl/` directory:*
 >
-> - [ ] **Arithmetic Logic Unit (ALU):** Implemented core logic (ADD, SUB, Shifts, Logic ops).
-> - [ ] **ALU Testbench:** Verified combinational logic using Verilator and GTKWave.
-> - [-] **Instruction Fetch (IF) Stage:** Program Counter and Instruction Memory interfacing.
-> - [ ] **Instruction Decode (ID) Stage:** Register File and Control Unit decoding.
-> - [ ] **Execution (EX) Stage:** ALU integration and branch resolution.
-> - [ ] **Memory (MEM) & Writeback (WB) Stages.**
+> - [x] **Top-Level CPU Wrapper (`cpu.sv`):** Setting up the main processor module, interface definitions, and signal routing. *(Currently working on this)*
+> - [🚧] **Instruction Fetch (IF) Stage:** Implementing Program Counter (PC) logic and Instruction Memory interfacing.
+> - [ ] **Instruction Decode (ID) Stage:** Register File implementation and Control Unit instruction decoding.
+> - [ ] **Execution (EX) Stage & ALU:** Arithmetic/Logic operations (ADD, SUB, Shifts) and branch resolution.
+> - [ ] **Memory (MEM) & Writeback (WB) Stages:** Data memory interfacing and register writeback logic.
+> - [ ] **Testbench & Verification:** Full pipeline validation using Verilator and GTKWave.
 >
+
 ---
 
 *(Original Project README from Graz University of Technology below)*
