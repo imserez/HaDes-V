@@ -24,7 +24,28 @@ module fetch_stage (
     input  logic [31:0] jump_address_backwards_in
 );
 
-    // TODO: Delete the following line and implement this module.
-    ref_fetch_stage golden(.*);
+
+    logic [31:0] pc = 0;
+
+    always @(posedge clk) begin
+
+        if(rst) begin
+            pc <= 0;
+        end
+        else begin
+
+
+
+            pc <= pc + 1;
+
+            program_counter_reg_out <= pc + 1;
+        end
+    end
+
+
+
+
+    // // TODO: Delete the following line and implement this module.
+    // ref_fetch_stage golden(.*);
 
 endmodule
