@@ -12,15 +12,13 @@
 > ### 🛠️ My Implementation Progress
 > *Below is the live status of the modules I am actively writing in the `rtl/` directory:*
 >
-> - [x] **Arithmetic Logic Unit (ALU):** Implemented core logic (ADD, SUB, Shifts, Logic ops).
-> - [x] **ALU Testbench:** Verified combinational logic using Verilator and GTKWave.
-> - [ ] **Instruction Fetch (IF) Stage:** Program Counter and Instruction Memory interfacing.
+> - [ ] **Arithmetic Logic Unit (ALU):** Implemented core logic (ADD, SUB, Shifts, Logic ops).
+> - [ ] **ALU Testbench:** Verified combinational logic using Verilator and GTKWave.
+> - [-] **Instruction Fetch (IF) Stage:** Program Counter and Instruction Memory interfacing.
 > - [ ] **Instruction Decode (ID) Stage:** Register File and Control Unit decoding.
 > - [ ] **Execution (EX) Stage:** ALU integration and branch resolution.
 > - [ ] **Memory (MEM) & Writeback (WB) Stages.**
 >
-> *Next Step (March 2026): Integrating a custom Matrix Multiply Unit (MMU) accelerator into the pipeline for Edge AI workloads.*
-
 ---
 
 *(Original Project README from Graz University of Technology below)*
