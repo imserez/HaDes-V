@@ -1,3 +1,30 @@
+# 🚀 HaDes-V: My RISC-V Processor Implementation 
+
+![SystemVerilog](https://img.shields.io/badge/SystemVerilog-005288?style=flat-square&logo=verilog&logoColor=white)
+![Status](https://img.shields.io/badge/Status-Active_Development-orange?style=flat-square)
+
+> **👤 Personal Project Log - Sergi Juárez**
+> 
+> This repository contains my active development of the **HaDes-V** processor core. I am building this 32-bit pipelined RISC-V (RV32I) CPU from scratch using SystemVerilog, following the modular architecture provided by the Graz University of Technology (see original OER details below).
+>
+> My goal with this project is to deeply understand **CPU architecture, hardware description languages (RTL), and the hardware/software boundary**.
+>
+> ### 🛠️ My Implementation Progress
+> *Below is the live status of the modules I am actively writing in the `rtl/` directory:*
+>
+> - [x] **Arithmetic Logic Unit (ALU):** Implemented core logic (ADD, SUB, Shifts, Logic ops).
+> - [x] **ALU Testbench:** Verified combinational logic using Verilator and GTKWave.
+> - [ ] **Instruction Fetch (IF) Stage:** Program Counter and Instruction Memory interfacing.
+> - [ ] **Instruction Decode (ID) Stage:** Register File and Control Unit decoding.
+> - [ ] **Execution (EX) Stage:** ALU integration and branch resolution.
+> - [ ] **Memory (MEM) & Writeback (WB) Stages.**
+>
+> *Next Step (March 2026): Integrating a custom Matrix Multiply Unit (MMU) accelerator into the pipeline for Edge AI workloads.*
+
+---
+
+*(Original Project README from Graz University of Technology below)*
+
 [instrguide]:https://repository.tugraz.at/oer/nytm4-grv34
 [lvref]:https://online.tugraz.at/tug_online/wbLv.wbShowLVDetail?pStpSpNr=525082
 [vivado]:https://www.xilinx.com/support/download.html
@@ -101,5 +128,3 @@ For questions, licensing, test bench inquiries, or further information, please c
 We published this OER at the [RISC-V Summit Europe 2025](https://riscv-europe.org/summit/2025/) as a [Poster](https://graz.elsevierpure.com/files/93678000/HaDes_V_Poster-CR_v1.pdf) and an extended [Abstract Paper](https://www.scheipel.com/wp-content/uploads/2025/05/HaDes_V_RISC_V_Summit_camera_ready-1.pdf). 
 
 **The work also got featured on the official RISC-V International [Blog](https://riscv.org/blog/) [here](https://riscv.org/blog/2025/05/hades-v-learning-by-puzzling-a-modular-approach-to-risc-v-processor-design-education/).**
-
-
