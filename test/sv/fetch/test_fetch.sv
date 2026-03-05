@@ -56,9 +56,16 @@ module test_fetch;
     wishbone_interface              dut_memory_fetch_port();
     logic [31:0]                    dut_instruction_reg_out;
     logic [31:0]                    dut_program_counter_reg_out;
-    logic [31:0]                    dut_jump_address_backwards_in;
     pipeline_status::forwards_t     dut_status_forwards_out;
-    pipeline_status::backwards_t    dut_status_backwards_in;
+
+    logic [31:0]                    tb_jump_address_backwards_in;
+    pipeline_status::backwards_t    tb_status_backwards_in;
+
+    wishbone_interface              ref_memory_fetch_port();
+    logic [31:0]                    ref_instruction_reg_out;
+    logic [31:0]                    ref_program_counter_reg_out;
+    pipeline_status::forwards_t     ref_status_forwards_out;
+
 
     fetch_stage dut (
         .clk(clk),
@@ -67,9 +74,26 @@ module test_fetch;
         .instruction_reg_out(dut_instruction_reg_out),
         .program_counter_reg_out(dut_program_counter_reg_out),
         .status_forwards_out(dut_status_forwards_out),
-        .status_backwards_in(dut_status_backwards_in),
-        .jump_address_backwards_in(dut_jump_address_backwards_in)
+        .status_backwards_in(tb_status_backwards_in),
+        .jump_address_backwards_in(tb_jump_address_backwards_in)
     );
+
+    ref_fetch_stage ref_fetch (
+        .clk(clk),
+        .rst(rst),
+        .wb(ref_memory_fetch_port.master),
+        .instruction_reg_out(ref_instruction_reg_out),
+        .program_counter_reg_out(ref_program_counter_reg_out),
+        .status_forwards_out(ref_status_forwards_out),
+        .status_backwards_in(tb_status_backwards_in),
+        .jump_address_backwards_in(tb_jump_address_backwards_in)
+    );
+
+
+
+
+
+
 
     // --------------------------------------------------------------------------------------------
     // |                                    Main Test Function                                    |
