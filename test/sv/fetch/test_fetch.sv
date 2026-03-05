@@ -53,7 +53,7 @@ module test_fetch;
     logic [31:0] dut_write_data;
     logic        dut_write_enable;
 
-    wishbone_interface.master       dut_memory_fetch_port;
+    wishbone_interface              dut_memory_fetch_port();
     logic [31:0]                    dut_instruction_reg_out;
     logic [31:0]                    dut_program_counter_reg_out;
     logic [31:0]                    dut_jump_address_backwards_in;
@@ -63,7 +63,7 @@ module test_fetch;
     fetch_stage dut (
         .clk(clk),
         .rst(rst),
-        .wb(dut_memory_fetch_port),
+        .wb(dut_memory_fetch_port.master),
         .instruction_reg_out(dut_instruction_reg_out),
         .program_counter_reg_out(dut_program_counter_reg_out),
         .status_forwards_out(dut_status_forwards_out),
