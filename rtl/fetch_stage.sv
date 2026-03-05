@@ -33,15 +33,8 @@ module fetch_stage (
         STAGE_HOLD
     } fetch_state_t;
 
-    typedef enum logic [1:0] {
-        WB_SENT,
-        WB_WORKING,
-        WB_READY
-    } wb_state_t;
 
     logic [2:0] curr_fetch_status = fetch_state_t::STAGE_START;
-    logic [2:0] curr_wb_status;
-
 
     // combinational logic for backwarding status
     always_comb begin
@@ -71,6 +64,7 @@ module fetch_stage (
             wb.cyc <= 0;
             wb.stb <= 0;
             pc <= constants::RESET_ADDRESS;
+            status_forwards_out <= pipeline_status::BUBBLE;
             //TODO: maybe add here forwarding state? Bubble?
             //TODO: implement fetch_misaligned? %4?
             //TODO: what happens at the beginning if no rst is pressed? pc is asking for 0-address?
@@ -94,9 +88,6 @@ module fetch_stage (
                     STAGE_FETCH: begin
                         if (wb.err == 1) begin
                             status_forwards_out <= pipeline_status::FETCH_FAULT;
-                            // what with finished_rst here?
-
-                            // at this sage, retry read? pc to next instruction?
                         end
                         else if (wb.ack == 1) begin
                             // imagine, if we're ready, go fetch the next instruction and store the current. In case a JUMP is issued, clean our registers and read again. This time, fetch would be faster?
