@@ -66,7 +66,8 @@ module fetch_stage (
             wb.stb <= 0;
             pc <= constants::RESET_ADDRESS;
             status_forwards_out <= pipeline_status::BUBBLE;
-            //TODO: what happens at the beginning if no rst is pressed? pc is asking for 0-address?
+            // TODO: what happens at the beginning if no rst is pressed? pc is asking for 0-address?
+            // TODO: what if I only need to set to 0 stb signal, and not cyc?
         end
         else begin
 

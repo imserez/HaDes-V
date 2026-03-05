@@ -89,6 +89,14 @@ module test_fetch;
         .jump_address_backwards_in(tb_jump_address_backwards_in)
     );
 
+    //TODO: what if I send here the whole .master? instead of individuals.
+    dummy_memory dut_mem(.clk(clk),
+        .wb(dut_memory_fetch_port.slave),
+    );
+
+    dummy_memory ref_mem(.clk(clk),
+        .wb(ref_memory_fetch_port.slave),
+    );
 
 
 
