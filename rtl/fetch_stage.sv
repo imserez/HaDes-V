@@ -27,12 +27,8 @@ module fetch_stage (
 
     logic [31:0] pc = 0;
 
-    logic [1:0] saved = 0;
-    logic [1:0] finished_reset = 0;
-
-
     typedef enum logic [1:0] {
-        STAGE_RST,
+        STAGE_START,
         STAGE_FETCH,
         STAGE_HOLD
     } fetch_state_t;
@@ -43,8 +39,7 @@ module fetch_stage (
         WB_READY
     } wb_state_t;
 
-
-    logic [2:0] curr_fetch_status = fetch_state_t::STAGE_RST;
+    logic [2:0] curr_fetch_status = fetch_state_t::STAGE_START;
     logic [2:0] curr_wb_status;
 
 
@@ -72,25 +67,31 @@ module fetch_stage (
     always_ff @(posedge clk) begin
 
         if (rst) begin
-            curr_fetch_status <= fetch_state_t::STAGE_FETCH;
+            curr_fetch_status <= fetch_state_t::STAGE_START;
             wb.cyc <= 0;
             wb.stb <= 0;
-            finished_reset <= 0;
             pc <= constants::RESET_ADDRESS;
             //TODO: maybe add here forwarding state? Bubble?
             //TODO: implement fetch_misaligned? %4?
+            //TODO: what happens at the beginning if no rst is pressed? pc is asking for 0-address?
         end
         else begin
 
-            if (status_backwards_in == pipeline_status::JUMP && finished_reset) begin
+            if (status_backwards_in == pipeline_status::JUMP) begin
                 pc <= jump_address_backwards_in;
                 status_forwards_out <= pipeline_status::BUBBLE;
+                curr_fetch_status <= fetch_state_t::STAGE_START;
+                wb.cyc <= 0; // re-fetch
+                wb.stb <= 0; // re-fetch
             end
             else begin
                 case (curr_fetch_status)
-                    STAGE_FETCH: begin
+                    STAGE_START: begin
+                        curr_fetch_status <= fetch_state_t::STAGE_FETCH;
                         wb.cyc <= 1;
                         wb.stb <= 1;
+                    end
+                    STAGE_FETCH: begin
                         if (wb.err == 1) begin
                             status_forwards_out <= pipeline_status::FETCH_FAULT;
                             // what with finished_rst here?
@@ -98,8 +99,6 @@ module fetch_stage (
                             // at this sage, retry read? pc to next instruction?
                         end
                         else if (wb.ack == 1) begin
-                            finished_reset <= 1;
-
                             // imagine, if we're ready, go fetch the next instruction and store the current. In case a JUMP is issued, clean our registers and read again. This time, fetch would be faster?
                             instruction_reg_out <= wb.dat_miso; // miso = read!
 
