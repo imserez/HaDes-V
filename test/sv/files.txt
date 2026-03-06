@@ -1,1 +1,3 @@
-
+rtl/fetch_stage.sv
+test/sv/fetch/dummy_memory.sv
+test/sv/fetch/test_fetch.sv

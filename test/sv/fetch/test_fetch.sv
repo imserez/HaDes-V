@@ -91,74 +91,94 @@ module test_fetch;
 
     //TODO: what if I send here the whole .master? instead of individuals.
     dummy_memory dut_mem(.clk(clk),
-        .wb(dut_memory_fetch_port.slave),
+        .wb(dut_memory_fetch_port.slave)
     );
 
     dummy_memory ref_mem(.clk(clk),
-        .wb(ref_memory_fetch_port.slave),
+        .wb(ref_memory_fetch_port.slave)
     );
 
 
+    initial begin
+        $dumpfile("test_fetch.fst");
+        $dumpvars(0, test_fetch);
 
+        rst = 1;
+        // tb_jump_address_backwards_in = 32'h0;
+
+        tb_status_backwards_in = pipeline_status::STALL;
+
+        repeat(5) @(posedge clk);
+
+        rst = 0;
+        $display("Finish Reset");
+
+        @(posedge clk);
+        tb_status_backwards_in = pipeline_status::READY;
+
+        repeat(20) @(posedge clk);
+
+        $finish();
+    end
 
 
 
     // --------------------------------------------------------------------------------------------
     // |                                    Main Test Function                                    |
     // --------------------------------------------------------------------------------------------
-    initial begin
-        $dumpfile("test_example.fst");
-        $dumpvars;
+    // initial begin
+    //     $dumpfile("test_example.fst");
+    //     $dumpvars;
 
-        reset_module_inputs();
+    //     reset_module_inputs();
 
-        // Write value to register ----------------------------------------------------------------
-        $display("------------------------------ (%6d ns) Write value to register", $time());
-        perform_rst();
+    //     // Write value to register ----------------------------------------------------------------
+    //     $display("------------------------------ (%6d ns) Write value to register", $time());
+    //     perform_rst();
 
-        @(posedge clk); #1;
-        set_write_port(.write_enable(1), .write_addr(1), .write_data(32'hcafebabe));
-        set_read_ports(.addr1(1), .addr2(0));
-        // check if data is correct
-        @(posedge clk);
-        prove(.exp_read_data1(0), .exp_read_data2(0)); // read old value
-        #1; // wait one simulation cycle
-        prove(.exp_read_data1(32'hcafebabe), .exp_read_data2(0)); // read new value
+    //     @(posedge clk); #1;
+    //     set_write_port(.write_enable(1), .write_addr(1), .write_data(32'hcafebabe));
+    //     set_read_ports(.addr1(1), .addr2(0));
+    //     // check if data is correct
+    //     @(posedge clk);
+    //     prove(.exp_read_data1(0), .exp_read_data2(0)); // read old value
+    //     #1; // wait one simulation cycle
+    //     prove(.exp_read_data1(32'hcafebabe), .exp_read_data2(0)); // read new value
 
-        // set new inputs
-        set_write_port(.write_enable(1), .write_addr(31), .write_data(32'hdeadbeef));
-        set_read_ports(.addr1(1), .addr2(31));
-        // check if data is correct
-        @(posedge clk);
-        prove(.exp_read_data1(32'hcafebabe), .exp_read_data2(0)); // read old value
-        #1; // wait one simulation cycle
-        prove(.exp_read_data1(32'hcafebabe), .exp_read_data2(32'hdeadbeef)); // read new value
+    //     // set new inputs
+    //     set_write_port(.write_enable(1), .write_addr(31), .write_data(32'hdeadbeef));
+    //     set_read_ports(.addr1(1), .addr2(31));
+    //     // check if data is correct
+    //     @(posedge clk);
+    //     prove(.exp_read_data1(32'hcafebabe), .exp_read_data2(0)); // read old value
+    //     #1; // wait one simulation cycle
+    //     prove(.exp_read_data1(32'hcafebabe), .exp_read_data2(32'hdeadbeef)); // read new value
 
-        // Check asynchron read -------------------------------------------------------------------
-        @(posedge clk);
-        $display("------------------------------ (%6d ns) Check asynchron read", $time());
+    //     // Check asynchron read -------------------------------------------------------------------
+    //     @(posedge clk);
+    //     $display("------------------------------ (%6d ns) Check asynchron read", $time());
 
-        set_read_ports(.addr1(31), .addr2(2));
-        #1; // wait one simulation cycle
-        prove(.exp_read_data1(32'hdeadbeef), .exp_read_data2(0));
+    //     set_read_ports(.addr1(31), .addr2(2));
+    //     #1; // wait one simulation cycle
+    //     prove(.exp_read_data1(32'hdeadbeef), .exp_read_data2(0));
 
-        set_read_ports(.addr1(30), .addr2(1));
-        #1; // wait one simulation cycle
-        prove(.exp_read_data1(0), .exp_read_data2(32'hcafebabe));
+    //     set_read_ports(.addr1(30), .addr2(1));
+    //     #1; // wait one simulation cycle
+    //     prove(.exp_read_data1(0), .exp_read_data2(32'hcafebabe));
 
-        set_read_ports(.addr1(1), .addr2(0));
-        #1; // wait one simulation cycle
-        prove(.exp_read_data1(32'hcafebabe), .exp_read_data2(0));
+    //     set_read_ports(.addr1(1), .addr2(0));
+    //     #1; // wait one simulation cycle
+    //     prove(.exp_read_data1(32'hcafebabe), .exp_read_data2(0));
 
-        @(posedge clk);
-        @(posedge clk);
+    //     @(posedge clk);
+    //     @(posedge clk);
 
-        // Signal test passed ---------------------------------------------------------------------
-        print_test_done();
+    //     // Signal test passed ---------------------------------------------------------------------
+    //     print_test_done();
 
-        // Stop simulation ------------------------------------------------------------------------
-        $finish();
-    end
+    //     // Stop simulation ------------------------------------------------------------------------
+    //     $finish();
+    // end
 
     // --------------------------------------------------------------------------------------------
     function void reset_module_inputs();

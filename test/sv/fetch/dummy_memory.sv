@@ -1,6 +1,6 @@
 module dummy_memory (
         input logic clk,
-        wishbone_interface.slave wb,
+        wishbone_interface.slave wb
     );
 
         logic [7:0] delays   = 0;

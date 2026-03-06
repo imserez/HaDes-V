@@ -27,22 +27,16 @@ module fetch_stage (
 
     logic [31:0] pc = 0;
 
-    typedef enum logic [1:0] {
-        STAGE_START,
-        STAGE_FETCH,
-        STAGE_HOLD,
-        STAGE_ERR
-    } fetch_state_t;
 
 
-    logic [2:0] curr_fetch_status = fetch_state_t::STAGE_START;
+    import fetch_status::*;
+    fetch_state_t curr_fetch_status = STAGE_START;
 
     // combinational logic for backwarding status
     always_comb begin
         wb.adr = pc >> 2;    // interesting, comb. logic
     end
     // check if finished_reset makes sense
-
 
 
     // Notes for myself:
@@ -61,7 +55,7 @@ module fetch_stage (
     always_ff @(posedge clk) begin
 
         if (rst) begin
-            curr_fetch_status <= fetch_state_t::STAGE_START;
+            curr_fetch_status <= STAGE_START;
             wb.cyc <= 0;
             wb.stb <= 0;
             pc <= constants::RESET_ADDRESS;
@@ -78,11 +72,11 @@ module fetch_stage (
 
                 if (jump_address_backwards_in[1:0] & 2'b11) begin // MISALIGNED!! is 0 = false, that's why.
                     status_forwards_out <= pipeline_status::FETCH_MISALIGNED;
-                    curr_fetch_status <= fetch_state_t::STAGE_ERR;
+                    curr_fetch_status <= STAGE_ERR;
                 end
                 else begin
                     status_forwards_out <= pipeline_status::BUBBLE;
-                    curr_fetch_status <= fetch_state_t::STAGE_START;
+                    curr_fetch_status <= STAGE_START;
                 end
 
             end
@@ -92,7 +86,7 @@ module fetch_stage (
                         status_forwards_out <= pipeline_status::BUBBLE;
                     end
                     STAGE_START: begin
-                        curr_fetch_status <= fetch_state_t::STAGE_FETCH;
+                        curr_fetch_status <= STAGE_FETCH;
                         wb.cyc <= 1;
                         wb.stb <= 1;
                     end
@@ -101,19 +95,19 @@ module fetch_stage (
                             status_forwards_out <= pipeline_status::FETCH_FAULT;
                             wb.cyc <= 0; // re-fetch
                             wb.stb <= 0; // re-fetch
-                            curr_fetch_status <= fetch_state_t::STAGE_ERR;
+                            curr_fetch_status <= STAGE_ERR;
                         end
                         else if (wb.ack == 1) begin
                             // imagine, if we're ready, go fetch the next instruction and store the current. In case a JUMP is issued, clean our registers and read again. This time, fetch would be faster?
                             instruction_reg_out <= wb.dat_miso; // miso = read!
 
                             if (status_backwards_in == pipeline_status::READY) begin
-                                curr_fetch_status <= fetch_state_t::STAGE_FETCH;
+                                curr_fetch_status <= STAGE_FETCH;
                                 status_forwards_out <= pipeline_status::VALID;
                                 pc <= pc + 4;
                             end
                             else begin
-                                curr_fetch_status <= fetch_state_t::STAGE_HOLD;
+                                curr_fetch_status <= STAGE_HOLD;
                                 status_forwards_out <= pipeline_status::VALID;
                                 wb.cyc <= 0;
                                 wb.stb <= 0;
@@ -126,7 +120,7 @@ module fetch_stage (
                     STAGE_HOLD: begin
                         if (status_backwards_in == pipeline_status::READY) begin
                             pc <= pc + 4;
-                            curr_fetch_status <= fetch_state_t::STAGE_FETCH;
+                            curr_fetch_status <= STAGE_FETCH;
                             status_forwards_out <= pipeline_status::BUBBLE;
                             wb.cyc <= 1;
                             wb.stb <= 1;

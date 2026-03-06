@@ -32,3 +32,14 @@ package pipeline_status;
 endpackage
 
 /*verilator lint_on UNUSED*/
+
+package fetch_status;
+
+  typedef enum logic [1:0] {
+        STAGE_START,
+        STAGE_FETCH,
+        STAGE_HOLD,
+        STAGE_ERR
+    } fetch_state_t;
+
+endpackage
