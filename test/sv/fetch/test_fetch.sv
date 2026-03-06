@@ -94,18 +94,19 @@ module test_fetch;
         tb_status_backwards_in = pipeline_status::STALL;
 
         perform_reset();
-        check_fetch(0, fetch_status::STAGE_START);
+        check_fetch(constants::RESET_ADDRESS, 0, fetch_status::STAGE_START);
         @(posedge clk); #1;
-        check_fetch(constants::RESET_ADDRESS, fetch_status::STAGE_FETCH);
+        check_fetch(constants::RESET_ADDRESS, 0, fetch_status::STAGE_FETCH);
         @(posedge clk); #1;
 
         wait(dut_memory_fetch_port.ack == 1);
-        check_fetch(constants::RESET_ADDRESS, fetch_status::STAGE_HOLD);
+        check_fetch(constants::RESET_ADDRESS, constants::RESET_ADDRESS, fetch_status::STAGE_HOLD);
 
         @(posedge clk); #1;
         tb_status_backwards_in = pipeline_status::READY;
 
         repeat(2) @(posedge clk);
+        check_fetch(constants::RESET_ADDRESS+4, constants::RESET_ADDRESS, fetch_status::STAGE_FETCH);
 
 
         repeat(10) @(posedge clk);
@@ -129,10 +130,16 @@ module test_fetch;
 
     // ------------- Tesing tasks
 
-    task automatic check_fetch(logic [31:0] exp_pc, fetch_state_t exp_state);
-        assert(dut.program_counter_reg_out == exp_pc)
+    task automatic check_fetch(logic [31:0] exp_pc, logic [31:0] exp_pc_reg_out, fetch_state_t exp_state);
+        assert(dut.pc == exp_pc)
             else begin
-                $error("PC error in <%0t.> Expected: [%h], Obtained: [%s]", $time, exp_pc, dut.program_counter_reg_out);
+                $error("PC error in <%0t.> Expected: [%h], Obtained: [%h]", $time, exp_pc, dut.pc);
+                error_count++;
+            end
+
+        assert(dut.program_counter_reg_out == exp_pc_reg_out)
+            else begin
+                $error("PC error in <%0t.> Expected: [%h], Obtained: [%h]", $time, exp_pc_reg_out, dut.program_counter_reg_out);
                 error_count++;
             end
 
