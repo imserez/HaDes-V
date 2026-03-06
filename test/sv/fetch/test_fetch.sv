@@ -91,11 +91,24 @@ module test_fetch;
         $dumpfile("test_fetch.fst");
         $dumpvars(0, test_fetch);
 
+        tb_status_backwards_in = pipeline_status::STALL;
+
         perform_reset();
         check_fetch(0, fetch_status::STAGE_START);
         @(posedge clk); #1;
         check_fetch(constants::RESET_ADDRESS, fetch_status::STAGE_FETCH);
         @(posedge clk); #1;
+
+        wait(dut_memory_fetch_port.ack == 1);
+        check_fetch(constants::RESET_ADDRESS, fetch_status::STAGE_HOLD);
+
+        @(posedge clk); #1;
+        tb_status_backwards_in = pipeline_status::READY;
+
+        repeat(2) @(posedge clk);
+
+
+        repeat(10) @(posedge clk);
 
         // Signal test passed ---------------------------------------------------------------------
         print_test_done();
@@ -128,6 +141,15 @@ module test_fetch;
                 $error("Curr. Fetch Status Error in <%0t.> Expected: [%h], Obtained: [%s]", $time, exp_state.name(), dut.curr_fetch_status.name());
                 error_count++;
             end
+    endtask
+
+    task automatic check_forwards_out(pipeline_status::forwards_t exp_status_fowards_out);
+        assert (dut.status_forwards_out == exp_status_fowards_out)
+            else begin
+                 $error("Status forwards out error. <%0t.> Expected: [%s], Obtained: [%s]", $time, exp_status_fowards_out.name(), dut.status_forwards_out.name());
+                    error_count++;
+            end
+
     endtask
 
     // --------------------------------------------------------------------------------------------
