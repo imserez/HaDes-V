@@ -99,28 +99,84 @@ module test_fetch;
     );
 
 
+    int test_id = 0;
+
+    // initial begin
+    //     $dumpfile("test_fetch.fst");
+    //     $dumpvars(0, test_fetch);
+    //     // ----------------------------------------------------------------
+
+    //     // ** Testing FETCH->HOLD stage **
+
+
+
+    //     // #BEGIN#          EPILOGUE
+    //     perform_reset();
+    //     // #END#            --------
+    //     check_fetch(32'h0, STAGE_START);
+
+    //     $display("Starting FETCH->HOLD test");
+    //     tb_status_backwards_in = pipeline_status::STALL;
+    //     repeat(4) @(posedge clk);
+    //     // #BEGIN#          PROLOGUE
+    //     $display("Finished FETCH->HOLD test");
+    //     // #END#            --------
+    //     // ----------------------------------------------------------------
+    //     repeat(20) @(posedge clk);
+
+    //     $finish();
+    // end
+
+
     initial begin
+
         $dumpfile("test_fetch.fst");
         $dumpvars(0, test_fetch);
 
-        rst = 1;
-        // tb_jump_address_backwards_in = 32'h0;
+        perform_reset();
+
+        #1;
+        check_fetch(constants::RESET_ADDRESS, fetch_status::STAGE_FETCH);
+
+        $display("--- Iniciando FETCH -> HOLD test ---");
+
+        tb_status_backwards_in = pipeline_status::READY;
+        @(posedge clk);
+
+        wait(dut_memory_fetch_port.ack == 1);
 
         tb_status_backwards_in = pipeline_status::STALL;
 
-        repeat(5) @(posedge clk);
+        @(posedge clk); #1;
 
-        rst = 0;
-        $display("Finish Reset");
+        check_fetch(32'h0, fetch_status::STAGE_HOLD);
 
-        @(posedge clk);
-        tb_status_backwards_in = pipeline_status::READY;
+        repeat(14) @(posedge clk); #1;
+        check_fetch(32'h0, fetch_status::STAGE_HOLD);
 
-        repeat(20) @(posedge clk);
-
+        $display("--- Finished test ---");
+        print_test_done();
         $finish();
+
     end
 
+    task automatic perform_reset();
+        rst = 1;
+        repeat(5) @(posedge clk);
+        rst = 0;
+        @(posedge clk);
+    endtask
+
+    task automatic check_fetch(logic [31:0] exp_pc, logic [1:0] exp_state);
+        if (dut_program_counter_reg_out !== exp_pc || dut.curr_fetch_status !== exp_state) begin
+            $display("ERROR in time: %t", $time);
+            $display("Expected: PC=%h, Status=%b", exp_pc, exp_state);
+            $display("Obtained: PC=%h, Status=%b", dut_program_counter_reg_out, dut.curr_fetch_status);
+            error_count++;
+        end else begin
+            $display("CHECK OK in time %t", $time);
+        end
+    endtask
 
 
     // --------------------------------------------------------------------------------------------
