@@ -136,6 +136,7 @@ module test_fetch;
         perform_reset();
 
         #1;
+        $display("Checking values after RESET");
         check_fetch(constants::RESET_ADDRESS, fetch_status::STAGE_FETCH);
 
         $display("--- Iniciando FETCH -> HOLD test ---");
@@ -154,7 +155,13 @@ module test_fetch;
         repeat(14) @(posedge clk); #1;
         check_fetch(32'h0, fetch_status::STAGE_HOLD);
 
-        $display("--- Finished test ---");
+
+
+
+
+
+
+        $display("--- Finished tests ---");
         print_test_done();
         $finish();
 
