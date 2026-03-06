@@ -101,6 +101,7 @@ module fetch_stage (
                         else if (wb.ack == 1) begin
                             // imagine, if we're ready, go fetch the next instruction and store the current. In case a JUMP is issued, clean our registers and read again. This time, fetch would be faster?
                             instruction_reg_out <= wb.dat_miso; // miso = read!
+                            program_counter_reg_out <= pc;
 
                             if (status_backwards_in == pipeline_status::READY) begin
                                 curr_fetch_status <= STAGE_FETCH;
@@ -129,8 +130,6 @@ module fetch_stage (
                     end
                 endcase
             end
-
-            program_counter_reg_out <= pc;
         end
     end
 
