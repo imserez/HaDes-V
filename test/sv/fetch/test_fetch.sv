@@ -117,7 +117,8 @@ module test_fetch;
         // Stop simulation ------------------------------------------------------------------------
         $finish();
 
-
+        // TODO: i see a desync between reg out anc pc out. Check that, also check ack in dummy mem...
+        // TODO: add more test-cases, add a way to always know the memory that I should be returning
     end;
 
     // ------------- State-modify Tasks
