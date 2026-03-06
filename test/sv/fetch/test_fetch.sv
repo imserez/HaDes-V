@@ -90,7 +90,6 @@ module test_fetch;
         .jump_address_backwards_in(tb_jump_address_backwards_in)
     );
 
-    //TODO: what if I send here the whole .master? instead of individuals.
     dummy_memory dut_mem(.clk(clk),
         .wb(dut_memory_fetch_port.slave)
     );
@@ -101,33 +100,6 @@ module test_fetch;
 
 
     int test_id = 0;
-
-    // initial begin
-    //     $dumpfile("test_fetch.fst");
-    //     $dumpvars(0, test_fetch);
-    //     // ----------------------------------------------------------------
-
-    //     // ** Testing FETCH->HOLD stage **
-
-
-
-    //     // #BEGIN#          EPILOGUE
-    //     perform_reset();
-    //     // #END#            --------
-    //     check_fetch(32'h0, STAGE_START);
-
-    //     $display("Starting FETCH->HOLD test");
-    //     tb_status_backwards_in = pipeline_status::STALL;
-    //     repeat(4) @(posedge clk);
-    //     // #BEGIN#          PROLOGUE
-    //     $display("Finished FETCH->HOLD test");
-    //     // #END#            --------
-    //     // ----------------------------------------------------------------
-    //     repeat(20) @(posedge clk);
-
-    //     $finish();
-    // end
-
 
     initial begin
 
@@ -153,11 +125,43 @@ module test_fetch;
         repeat(14) @(posedge clk); #1;
         check_fetch(constants::RESET_ADDRESS, fetch_status::STAGE_HOLD);
         $display("Checking the value readed");
+        check_instruction_reg_out(constants::RESET_ADDRESS, dut.pc >> 2);
 
 
+        $display("--- Test: Resume after HOLD ---");
+        tb_status_backwards_in = pipeline_status::READY;
+        @(posedge clk);
+
+        wait(dut_memory_fetch_port.ack == 1);
+        @(posedge clk); #1;
+        check_fetch(32'h4, fetch_status::STAGE_FETCH);
 
 
+        $display("--- Test: Immediate Jump ---");
+        tb_jump_address_backwards_in = 32'h20;
+        tb_status_backwards_in = pipeline_status::JUMP;
 
+        @(posedge clk); #1;
+        check_fetch(32'h20, fetch_status::STAGE_FETCH);
+
+        // Volvemos a READY para que termine de pedir la instrucción en 0x20
+        tb_status_backwards_in = pipeline_status::READY;
+        wait(dut_memory_fetch_port.ack == 1);
+        @(posedge clk); #1;
+        check_fetch(32'h20, fetch_status::STAGE_FETCH);
+
+
+        $display("--- Test: Misaligned Jump (Error case) ---");
+        tb_jump_address_backwards_in = 32'h23;
+        tb_status_backwards_in = pipeline_status::JUMP;
+
+        @(posedge clk); #1;
+        check_fetch(32'h23, fetch_status::STAGE_ERR);
+
+        if (dut_status_forwards_out !== pipeline_status::FETCH_MISALIGNED) begin
+            $display("ERROR: No se detecto FETCH_MISALIGNED en la salida");
+            error_count++;
+        end
 
         $display("--- Finished tests ---");
         print_test_done();
@@ -173,22 +177,20 @@ module test_fetch;
     endtask
 
     task automatic check_instruction_reg_out(logic [31:0] exp_pc_reg_out, logic [31:0] exp_reg_out);
-        if (dut_program_counter_reg_out !== exp_pc_reg_out || dut.instruction_reg_out !== exp_reg_out) begin
+        if (dut_program_counter_reg_out !== exp_pc_reg_out || dut.instruction_reg_out >> 2 !== exp_reg_out) begin
             $display("ERROR in time: %t", $time);
-            $display("Expected: PC-OUT=%h, Instruction=%b", exp_pc_reg_out, exp_reg_out);
-            $display("Obtained: PC-OUT=%h, Instruction=%b", dut.program_counter_reg_out, dut.instruction_reg_out);
+            $display("Expected: PC-OUT=%h, Instruction=%h", exp_pc_reg_out, exp_reg_out);
+            $display("Obtained: PC-OUT=%h, Instruction=%h", dut.program_counter_reg_out, dut.instruction_reg_out);
             error_count++;
         end else begin
             $display("CHECK OK in time %t", $time);
-            $display("Obtained: PC-OUT=%h, Instruction=%b", dut.program_counter_reg_out, dut.instruction_reg_out);
+            $display("Obtained: PC-OUT=%h, Instruction=%h", dut.program_counter_reg_out, dut.instruction_reg_out);
 
         end
     endtask
 
 
     task automatic check_fetch(logic [31:0] exp_pc, logic [1:0] exp_state);
-        fetch_state_t current_state_enum;
-        current_state_enum = fetch_state_t'(dut.curr_fetch_status);
 
         if (dut_program_counter_reg_out !== exp_pc || dut.curr_fetch_status !== exp_state) begin
             $display("ERROR in time: %t", $time);
