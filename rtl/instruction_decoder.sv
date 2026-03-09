@@ -90,7 +90,32 @@ module instruction_decoder (
                 endcase
             end
 
+            7'b0000011: begin // L-TYPE
+
+                instruction_out.rd_address  = instruction_in[11:7];
+                instruction_out.rs1_address = instruction_in[19:15];
+                instruction_out.rs2_address = 5'b0;
+                instruction_out.immediate   = { {20{instruction_in[31]}}, instruction_in[31:20] };
+                // instruction_out.csr         = csr::     ;
+
+                case (instruction_in[14:12])
+                    3'b000: instruction_out.op = op::LB;
+                    3'b001: instruction_out.op = op::LH;
+                    3'b010: instruction_out.op = op::LW;
+                    3'b100: instruction_out.op = op::LBU;
+                    3'b101: instruction_out.op = op::LHU;
+                    default: instruction_out.op = op::ILLEGAL;
+                endcase
+            end
+
+
+
             7'b0110111, 7'b0010111: begin // U-TYPE
+                instruction_out.rd_address  = 5'b0;
+                instruction_out.rs1_address = instruction_in[19:15];
+                instruction_out.rs2_address = instruction_in[24:20];
+                instruction_out.immediate   = { {20{instruction_in[31]}}, instruction_in[31:25], instruction_in[11:7] };
+                // instruction_out.csr         = csr::     ;
             end
 
             7'b1101111: begin // J-TYPE
