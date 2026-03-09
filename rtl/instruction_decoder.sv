@@ -53,6 +53,7 @@ module instruction_decoder (
                     default: instruction_out.op = op::ILLEGAL;
                 endcase
             end
+
             7'b0010011: begin // I-TYPE
                 instruction_out.rd_address  = instruction_in[11:7];
                 instruction_out.rs1_address = instruction_in[19:15];
@@ -73,8 +74,28 @@ module instruction_decoder (
                     default: instruction_out.op = op::ILLEGAL;
                 endcase
             end
+
             7'b0100011: begin // S-TYPE
+                instruction_out.rd_address  = 5'b0;
+                instruction_out.rs1_address = instruction_in[19:15];
+                instruction_out.rs2_address = instruction_in[24:20];
+                instruction_out.immediate   = { {20{instruction_in[31]}}, instruction_in[31:25], instruction_in[11:7] };
+                // instruction_out.csr         = csr::     ;
+
+                case (instruction_in[14:12])
+                    3'b000: instruction_out.op  = op::SB;
+                    3'b001: instruction_out.op  = op::SH;
+                    3'b010: instruction_out.op  = op::SW;
+                    default: instruction_out.op = op::ILLEGAL;
+                endcase
             end
+
+            7'b0110111, 7'b0010111: begin // U-TYPE
+            end
+
+            7'b1101111: begin // J-TYPE
+            end
+
             7'b1100011: begin // B-TYPE
                 instruction_out.rd_address  = 5'b0;
                 instruction_out.rs1_address = instruction_in[19:15];
@@ -87,17 +108,23 @@ module instruction_decoder (
                     1'b0
                 };
                 // instruction_out.csr         = csr::     ;
+
+                case (instruction_in[14:12])
+                    3'b000: instruction_out.op = op::BEQ;
+                    3'b001: instruction_out.op = op::BNE;
+                    3'b100: instruction_out.op = op::BLT;
+                    3'b101: instruction_out.op = op::BGE;
+                    3'b110: instruction_out.op = op::BLTU;
+                    3'b111: instruction_out.op = op::BGEU;
+                    default: instruction_out.op = op::ILLEGAL;
+                endcase
             end
-
-
 
         endcase
 
     end
 
-
-
-    // TODO: Delete the following line and implement this module.
-    ref_instruction_decoder golden(.*);
+    // // TODO: Delete the following line and implement this module.
+    // ref_instruction_decoder golden(.*);
 
 endmodule
