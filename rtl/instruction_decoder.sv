@@ -75,21 +75,6 @@ module instruction_decoder (
                 endcase
             end
 
-            7'b0100011: begin // S-TYPE
-                instruction_out.rd_address  = 5'b0;
-                instruction_out.rs1_address = instruction_in[19:15];
-                instruction_out.rs2_address = instruction_in[24:20];
-                instruction_out.immediate   = { {20{instruction_in[31]}}, instruction_in[31:25], instruction_in[11:7] };
-                // instruction_out.csr         = csr::     ;
-
-                case (instruction_in[14:12])
-                    3'b000: instruction_out.op  = op::SB;
-                    3'b001: instruction_out.op  = op::SH;
-                    3'b010: instruction_out.op  = op::SW;
-                    default: instruction_out.op = op::ILLEGAL;
-                endcase
-            end
-
             7'b0000011: begin // L-TYPE
 
                 instruction_out.rd_address  = instruction_in[11:7];
@@ -108,17 +93,19 @@ module instruction_decoder (
                 endcase
             end
 
-
-
-            7'b0110111, 7'b0010111: begin // U-TYPE
+            7'b0100011: begin // S-TYPE
                 instruction_out.rd_address  = 5'b0;
                 instruction_out.rs1_address = instruction_in[19:15];
                 instruction_out.rs2_address = instruction_in[24:20];
                 instruction_out.immediate   = { {20{instruction_in[31]}}, instruction_in[31:25], instruction_in[11:7] };
                 // instruction_out.csr         = csr::     ;
-            end
 
-            7'b1101111: begin // J-TYPE
+                case (instruction_in[14:12])
+                    3'b000: instruction_out.op  = op::SB;
+                    3'b001: instruction_out.op  = op::SH;
+                    3'b010: instruction_out.op  = op::SW;
+                    default: instruction_out.op = op::ILLEGAL;
+                endcase
             end
 
             7'b1100011: begin // B-TYPE
@@ -144,6 +131,19 @@ module instruction_decoder (
                     default: instruction_out.op = op::ILLEGAL;
                 endcase
             end
+
+            7'b0110111, 7'b0010111: begin // U-TYPE
+                instruction_out.rd_address  = 5'b0;
+                instruction_out.rs1_address = instruction_in[19:15];
+                instruction_out.rs2_address = instruction_in[24:20];
+                instruction_out.immediate   = { {20{instruction_in[31]}}, instruction_in[31:25], instruction_in[11:7] };
+                // instruction_out.csr         = csr::     ;
+            end
+
+            7'b1101111: begin // J-TYPE
+            end
+
+
 
         endcase
 
