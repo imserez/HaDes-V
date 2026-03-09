@@ -24,7 +24,10 @@ module instruction_decoder (
 
     always_comb begin
         casez(instruction_in)
-            {22'b?, 5'b00000, 5'b00000}: instruction_out = ;
+
+            {22'b?, 5'b00000, 7'b0110011}: begin
+
+            end
 
         endcase
 
