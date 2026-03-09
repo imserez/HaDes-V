@@ -33,7 +33,58 @@ module decode_stage (
     output logic [31:0] jump_address_backwards_out
 );
 
-    // TODO: Delete the following line and implement this module.
-    ref_decode_stage golden(.*);
+    import decode_status::*;
+
+    decode_state_t curr_dec_status = STAGE_DECODE;
+
+
+
+    logic [31:0]  reg_instruction_in;
+    logic [31:0]  reg_pc_in,
+
+
+    always_ff @(posedge clk) begin
+
+        if (rst) begin
+            status_backwards_out <= pipeline_status::BUBBLE;
+            jump_address_backwards_out <= 0;
+            instruction_reg_out <= 0;
+            rs1_data_reg_out <= 0;
+            rs2_data_reg_out <= 0;
+            status_forwards_out <= pipeline_status::BUBBLE;
+            curr_dec_status <= STAGE_START;
+        end
+        else begin
+            case (curr_dec_status)
+                STAGE_START: begin
+                    curr_dec_status <= STAGE_WAIT;
+                    status_backwards_out <= pipeline_status::READY;
+                    status_forwards_out <= pipeline_status::BUBBLE;
+                end
+                STAGE_WAIT: begin
+                    status_forwards_out <= pipeline_status::BUBBLE;
+
+                    if (status_forwards_in == pipeline_status::VALID) begin
+                        reg_instruction_in <= instruction_in;
+                        reg_pc_in <= program_counter_in;
+                        curr_dec_status <= STAGE_DECODE;
+                        status_backwards_out <= pipeline_status::BUBBLE;
+                    end
+                end
+                STAGE_DECODE: begin
+
+                end
+
+            endcase
+
+        end
+
+
+    end
+
+
+
+    // // TODO: Delete the following line and implement this module.
+    // ref_decode_stage golden(.*);
 
 endmodule

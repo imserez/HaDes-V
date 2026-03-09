@@ -43,3 +43,15 @@ package fetch_status;
     } fetch_state_t;
 
 endpackage
+
+package decode_status;
+
+  typedef enum logic [1:0] {
+        STAGE_START,
+        STAGE_WAIT,
+        STAGE_DECODE,
+        STAGE_HOLD,
+        STAGE_ERR
+  } decode_state_t;
+
+endpackage
