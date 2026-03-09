@@ -12,6 +12,26 @@ module instruction_decoder (
     output instruction::t instruction_out
 );
 
+
+    // opcodes
+
+    // R = 0110011
+    // I = 0010011
+    // S = 0000011
+    // B = 0100011
+    // ....
+
+
+    always_comb begin
+        casez(instruction_in)
+            {22'b?, 5'b00000, 5'b00000}: instruction_out = ;
+
+        endcase
+
+    end
+
+
+
     // TODO: Delete the following line and implement this module.
     ref_instruction_decoder golden(.*);
 
