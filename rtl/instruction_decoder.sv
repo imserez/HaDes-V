@@ -33,22 +33,27 @@ module instruction_decoder (
                 instruction_out.rs2_address = instruction_in[24:20];
 
                 case ({instruction_in[31:25], instruction_in[14:12]})
-
                     {7'b0000000, 3'b000}: instruction_out.op = op::ADD;
                     {7'b0100000, 3'b000}: instruction_out.op = op::SUB;
+                    {7'b0000000, 3'b101}: instruction_out.op = op::SRL;
+                    {7'b0100000, 3'b101}: instruction_out.op = op::SRA;
 
+                    {7'b0000000, 3'b001}: instruction_out.op = op::SLL;
+                    {7'b0000000, 3'b010}: instruction_out.op = op::SLT;
+                    {7'b0000000, 3'b011}: instruction_out.op = op::SLTU
+                    {7'b0000000, 3'b100}: instruction_out.op = op::XOR;
+                    {7'b0000000, 3'b110}: instruction_out.op = op::OR;
+                    {7'b0000000, 3'b111}: instruction_out.op = op::AND;
+                    default: instruction_out.op = op::ILLEGAL;
                 endcase
-
                 case(instruction_in[14:12])
 
-                    3'b001: instruction_out.op = op.ADD;
-                    3'b010: instruction_out.op = op.ADD;
+                    3'b001: instruction_out.op = op.SLL;
+                    3'b010: instruction_out.op = op.SLT;
                     3'b011: instruction_out.op = op.ADD;
-                    3'b100: instruction_out.op = op.ADD;
-                    3'b110: instruction_out.op = op.ADD;
-                    3'b111: instruction_out.op = op.ADD;
-
-
+                    3'b100: instruction_out.op = op.SLTU;
+                    3'b110: instruction_out.op = op.OR;
+                    3'b111: instruction_out.op = op.AND;
                 endcase
             end
 
