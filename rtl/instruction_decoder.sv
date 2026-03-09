@@ -28,45 +28,46 @@ module instruction_decoder (
         case (instruction_in[6:0])
 
             7'b0110011: begin // R-TYPE
-                instruction_out.rd_address = instruction_in[11:7];
+                instruction_out.rd_address  = instruction_in[11:7];
                 instruction_out.rs1_address = instruction_in[19:15];
                 instruction_out.rs2_address = instruction_in[24:20];
+                instruction_out.immediate   = 0;
 
                 case ({instruction_in[31:25], instruction_in[14:12]})
                     {7'b0000000, 3'b000}: instruction_out.op = op::ADD;
                     {7'b0100000, 3'b000}: instruction_out.op = op::SUB;
-                    {7'b0000000, 3'b101}: instruction_out.op = op::SRL;
-                    {7'b0100000, 3'b101}: instruction_out.op = op::SRA;
-
                     {7'b0000000, 3'b001}: instruction_out.op = op::SLL;
                     {7'b0000000, 3'b010}: instruction_out.op = op::SLT;
                     {7'b0000000, 3'b011}: instruction_out.op = op::SLTU
                     {7'b0000000, 3'b100}: instruction_out.op = op::XOR;
+                    {7'b0000000, 3'b101}: instruction_out.op = op::SRL;
+                    {7'b0100000, 3'b101}: instruction_out.op = op::SRA;
                     {7'b0000000, 3'b110}: instruction_out.op = op::OR;
                     {7'b0000000, 3'b111}: instruction_out.op = op::AND;
                     default: instruction_out.op = op::ILLEGAL;
                 endcase
-                case(instruction_in[14:12])
+            end
+             7'b0010011: begin // I-TYPE
+                instruction_out.rd_address  = instruction_in[11:7];
+                instruction_out.rs1_address = instruction_in[19:15];
+                instruction_out.rs2_address = 0;
+                instruction_out.immediate   = { {20{instruction_in[31]}}, instruction_in[31:20] }; // Sign-extending!!
 
-                    3'b001: instruction_out.op = op.SLL;
-                    3'b010: instruction_out.op = op.SLT;
-                    3'b011: instruction_out.op = op.ADD;
-                    3'b100: instruction_out.op = op.SLTU;
-                    3'b110: instruction_out.op = op.OR;
-                    3'b111: instruction_out.op = op.AND;
+                casez ({instruction_in[31:20], instruction_in[14:12]})
+                    {12'b????????????, 3'b000}: instruction_out.op = op::ADDI;
+                    {12'b????????????, 3'b010}: instruction_out.op = op::SLTI;
+                    {12'b????????????, 3'b011}: instruction_out.op = op::SLTIU;
+                    {12'b????????????, 3'b100}: instruction_out.op = op::XORI;
+                    {12'b????????????, 3'b110}: instruction_out.op = op::ORI;
+                    {12'b????????????, 3'b111}: instruction_out.op = op::ANDI;
+                    {12'b0000000?????, 3'b001}: instruction_out.op = op::SLLI;
+                    {12'b0000000?????, 3'b101}: instruction_out.op = op::SRLI;
+                    {12'b0100000?????, 3'b101}: instruction_out.op = op::SRAI;
+                    default: instruction_out.op = op::ILLEGAL;
                 endcase
-            end
+             end
 
 
-
-        endcase
-
-
-        casez(instruction_in)
-
-            {25'b?, 7'b0110011}: begin
-
-            end
 
         endcase
 
