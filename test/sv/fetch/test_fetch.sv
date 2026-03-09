@@ -100,6 +100,7 @@ module test_fetch;
         @(posedge clk); #1;
 
         wait(dut_memory_fetch_port.ack == 1);
+        @(posedge clk); #1;
         check_fetch(constants::RESET_ADDRESS, constants::RESET_ADDRESS, fetch_status::STAGE_HOLD);
 
         @(posedge clk); #1;
@@ -109,6 +110,15 @@ module test_fetch;
         check_fetch(constants::RESET_ADDRESS+4, constants::RESET_ADDRESS, fetch_status::STAGE_FETCH);
 
 
+        repeat(4) @(posedge clk);
+
+
+        tb_status_backwards_in = pipeline_status::JUMP;
+        tb_jump_address_backwards_in = 31'h0012_0000;
+        @(posedge clk);
+        tb_jump_address_backwards_in = 31'h0000_0000;
+        tb_status_backwards_in = pipeline_status::READY;
+
         repeat(10) @(posedge clk);
 
         // Signal test passed ---------------------------------------------------------------------
@@ -116,9 +126,6 @@ module test_fetch;
 
         // Stop simulation ------------------------------------------------------------------------
         $finish();
-
-        // TODO: i see a desync between reg out anc pc out. Check that, also check ack in dummy mem...
-        // TODO: add more test-cases, add a way to always know the memory that I should be returning
     end;
 
     // ------------- State-modify Tasks
@@ -140,7 +147,7 @@ module test_fetch;
 
         assert(dut.program_counter_reg_out == exp_pc_reg_out)
             else begin
-                $error("PC error in <%0t.> Expected: [%h], Obtained: [%h]", $time, exp_pc_reg_out, dut.program_counter_reg_out);
+                $error("PC reg out error in <%0t.> Expected: [%h], Obtained: [%h]", $time, exp_pc_reg_out, dut.program_counter_reg_out);
                 error_count++;
             end
 

@@ -3,7 +3,7 @@ module dummy_memory (
         wishbone_interface.slave wb
     );
 
-        logic [7:0] delays   = 0;
+        logic [7:0] delays   = 1;
         logic [7:0] count    = 0;
 
         assign wb.err   = 0;

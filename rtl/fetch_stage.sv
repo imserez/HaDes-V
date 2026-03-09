@@ -87,9 +87,9 @@ module fetch_stage (
                         status_forwards_out <= pipeline_status::BUBBLE;
                     end
                     STAGE_START: begin
-                        curr_fetch_status <= STAGE_FETCH;
                         wb.cyc <= 1;
                         wb.stb <= 1;
+                        curr_fetch_status <= STAGE_FETCH;
                     end
                     STAGE_FETCH: begin
                         if (wb.err == 1) begin
