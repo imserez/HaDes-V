@@ -55,9 +55,11 @@ module fetch_stage (
     always_ff @(posedge clk) begin
 
         if (rst) begin
-            curr_fetch_status <= STAGE_START;
-            wb.cyc <= 0;
-            wb.stb <= 0;
+            // curr_fetch_status <= STAGE_START;
+            curr_fetch_status <= STAGE_FETCH;
+
+            wb.cyc <= 1;
+            wb.stb <= 1;
             pc <= constants::RESET_ADDRESS;
             program_counter_reg_out <= 0;
             status_forwards_out <= pipeline_status::BUBBLE;
@@ -90,8 +92,8 @@ module fetch_stage (
                         status_forwards_out <= pipeline_status::BUBBLE;
                     end
                     STAGE_START: begin
-                        wb.cyc <= 1;
-                        wb.stb <= 1;
+                        // wb.cyc <= 1;
+                        // wb.stb <= 1;
                         curr_fetch_status <= STAGE_FETCH;
                         status_forwards_out <= pipeline_status::BUBBLE;
                     end
