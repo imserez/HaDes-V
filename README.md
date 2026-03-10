@@ -1,5 +1,3 @@
-*(Original Project README from Graz University of Technology below)*
-
 [instrguide]:https://repository.tugraz.at/oer/nytm4-grv34
 [lvref]:https://online.tugraz.at/tug_online/wbLv.wbShowLVDetail?pStpSpNr=525082
 [vivado]:https://www.xilinx.com/support/download.html
