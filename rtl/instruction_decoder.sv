@@ -146,13 +146,60 @@ module instruction_decoder (
 
             end
 
-
-
             7'b1101111: begin // J-TYPE
+                instruction_out.rd_address  = instruction_in[11:7];
+                instruction_out.rs1_address = 5'b0;
+                instruction_out.rs2_address = 5'b0;
+                instruction_out.immediate = {
+                    {12{instruction_in[31]}},
+                    instruction_in[19:12],
+                    instruction_in[20],
+                    instruction_in[30:21],
+                    1'b0
+                };
+                // instruction_out.csr         = csr::     ;
+
+                instruction_out.op = op::JAL;
             end
 
+            7'b1110011: begin // SYS-TYPE
+                instruction_out.rd_address  = instruction_in[11:7];
+                instruction_out.rs1_address = instruction_in[19:15];
+                instruction_out.rs2_address = 5'b0;
+                instruction_out.immediate   = { 27'b0, instruction_in[19:15] };
 
-
+                if (instruction_in[19:7] == 13'b0) begin // this already includes func3 3'b000 !!
+                    case (instruction_in[31:20])
+                        12'b000000000000: instruction_out.op = op::ECALL;
+                        12'b000000000001: instruction_out.op = op::EBREAK;
+                        12'b001100000010: instruction_out.op = op::MRET;
+                        12'b000100000101: instruction_out.op = op::WFI;
+                    endcase
+                end
+                else begin
+                    instruction_out.csr = csr::t'(instruction_in[31:20]);
+                    case (instruction_in[14:12])
+                        3'b001: begin
+                            instruction_out.op = op::CSRRW;
+                        end
+                        3'b010: begin
+                            instruction_out.op = op::CSRRS;
+                        end
+                        3'b011: begin
+                            instruction_out.op = op::CSRRC;
+                        end
+                        3'b101: begin
+                            instruction_out.op = op::CSRRWI;
+                        end
+                        3'b110: begin
+                            instruction_out.op = op::CSRRSI;
+                        end
+                        3'b111: begin
+                            instruction_out.op = op::CSRRCI;
+                        end
+                    endcase
+                end
+            end
         endcase
 
     end
