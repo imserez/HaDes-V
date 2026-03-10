@@ -1,12 +1,13 @@
 module dummy_memory (
         input logic clk,
-        wishbone_interface.slave wb
+        wishbone_interface.slave wb,
+
     );
 
         logic [7:0] delays   = 1;
         logic [7:0] count    = 0;
 
-        assign wb.err   = 0;
+        assign wb.err   = 1;
 
         always_ff @(posedge clk) begin
 

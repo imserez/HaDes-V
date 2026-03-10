@@ -70,8 +70,8 @@ module fetch_stage (
         else begin
 
             if (status_backwards_in == pipeline_status::JUMP) begin
-                wb.cyc <= 0; // re-fetch
-                wb.stb <= 0; // re-fetch
+                // wb.cyc <= 0; // re-fetch
+                // wb.stb <= 0; // re-fetch
                 pc <= jump_address_backwards_in;
 
                 if (jump_address_backwards_in[1:0] & 2'b11) begin // MISALIGNED!! is 0 = false, that's why.
@@ -99,8 +99,8 @@ module fetch_stage (
                         if (wb.err == 1) begin
                             status_forwards_out <= pipeline_status::FETCH_FAULT;
                             program_counter_reg_out <= pc; // added: let other stages know the pc-error
-                            wb.cyc <= 0; // re-fetch
-                            wb.stb <= 0; // re-fetch
+                            // wb.cyc <= 0; // re-fetch
+                            // wb.stb <= 0; // re-fetch
                             curr_fetch_status <= STAGE_ERR;
                         end
                         else if (wb.ack == 1) begin
