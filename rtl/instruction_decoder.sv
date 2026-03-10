@@ -133,12 +133,20 @@ module instruction_decoder (
             end
 
             7'b0110111, 7'b0010111: begin // U-TYPE
-                instruction_out.rd_address  = 5'b0;
-                instruction_out.rs1_address = instruction_in[19:15];
-                instruction_out.rs2_address = instruction_in[24:20];
-                instruction_out.immediate   = { {20{instruction_in[31]}}, instruction_in[31:25], instruction_in[11:7] };
+                instruction_out.rd_address  = instruction_in[11:7];
+                instruction_out.rs1_address = 5'b0;
+                instruction_out.rs2_address = 5'b0;
+                instruction_out.immediate   = {instruction_in[31:12], 12'b0};
                 // instruction_out.csr         = csr::     ;
+
+                if (instruction_in[6:0] == 7'b0110111)
+                    instruction_out.op = op::LUI;
+                else
+                    instruction_out.op = op::AUIPC;
+
             end
+
+
 
             7'b1101111: begin // J-TYPE
             end
