@@ -201,7 +201,7 @@ test_exe_wb_2_nop:
     assert_value t6, 0x789
 
 # -----------------------------------------------
-# forward from mem instr (mem followed by exe)
+# forward from mem instr (mem followed by exe)      # 11
 test_mem_exe:
     addi t2, zero, 11
     flush_pipeline

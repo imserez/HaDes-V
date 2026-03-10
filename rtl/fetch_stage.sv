@@ -61,7 +61,10 @@ module fetch_stage (
             pc <= constants::RESET_ADDRESS;
             program_counter_reg_out <= 0;
             status_forwards_out <= pipeline_status::BUBBLE;
+
+            instruction_reg_out <= 32'b0;
             // TODO: what happens at the beginning if no rst is pressed? pc is asking for 0-address?
+
             // TODO: what if I only need to set to 0 stb signal, and not cyc?
         end
         else begin
@@ -90,6 +93,7 @@ module fetch_stage (
                         wb.cyc <= 1;
                         wb.stb <= 1;
                         curr_fetch_status <= STAGE_FETCH;
+                        status_forwards_out <= pipeline_status::BUBBLE;
                     end
                     STAGE_FETCH: begin
                         if (wb.err == 1) begin
@@ -105,9 +109,16 @@ module fetch_stage (
                             program_counter_reg_out <= pc;
 
                             if (status_backwards_in == pipeline_status::READY) begin
-                                curr_fetch_status <= STAGE_FETCH;
+
+                                curr_fetch_status <= STAGE_START;
                                 status_forwards_out <= pipeline_status::VALID;
                                 pc <= pc + 4;
+                                wb.cyc <= 0;
+                                wb.stb <= 0;
+
+                                // curr_fetch_status <= STAGE_FETCH;
+                                // status_forwards_out <= pipeline_status::VALID;
+                                // pc <= pc + 4;
                             end
                             else begin
                                 curr_fetch_status <= STAGE_HOLD;
@@ -125,8 +136,8 @@ module fetch_stage (
                             pc <= pc + 4;
                             curr_fetch_status <= STAGE_FETCH;
                             status_forwards_out <= pipeline_status::BUBBLE;
-                            wb.cyc <= 1;
-                            wb.stb <= 1;
+                            // wb.cyc <= 1;
+                            // wb.stb <= 1;
                         end
                     end
                 endcase
