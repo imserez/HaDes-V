@@ -105,20 +105,23 @@ module fetch_stage (
                         end
                         else if (wb.ack == 1) begin
                             // imagine, if we're ready, go fetch the next instruction and store the current. In case a JUMP is issued, clean our registers and read again. This time, fetch would be faster?
-                            instruction_reg_out <= wb.dat_miso; // miso = read!
-                            program_counter_reg_out <= pc;
+                            // instruction_reg_out <= wb.dat_miso; // miso = read!
+                            // program_counter_reg_out <= pc;
 
                             if (status_backwards_in == pipeline_status::READY) begin
 
-                                curr_fetch_status <= STAGE_START;
-                                status_forwards_out <= pipeline_status::VALID;
-                                pc <= pc + 4;
-                                wb.cyc <= 0;
-                                wb.stb <= 0;
+                                instruction_reg_out <= wb.dat_miso; //-
+                                program_counter_reg_out <= pc; // -
 
-                                // curr_fetch_status <= STAGE_FETCH;
+                                // curr_fetch_status <= STAGE_START;
                                 // status_forwards_out <= pipeline_status::VALID;
                                 // pc <= pc + 4;
+                                // wb.cyc <= 0;
+                                // wb.stb <= 0;
+
+                                curr_fetch_status <= STAGE_FETCH;
+                                status_forwards_out <= pipeline_status::VALID;
+                                pc <= pc + 4;
                             end
                             else begin
                                 curr_fetch_status <= STAGE_HOLD;
@@ -127,17 +130,17 @@ module fetch_stage (
                                 wb.stb <= 0;
                             end
                         end
-                        else begin
+                        else if (status_backwards_in == pipeline_status::READY) begin // -
                             status_forwards_out <= pipeline_status::BUBBLE;
                         end
                     end
                     STAGE_HOLD: begin
                         if (status_backwards_in == pipeline_status::READY) begin
-                            pc <= pc + 4;
+                            // pc <= pc + 4;
                             curr_fetch_status <= STAGE_FETCH;
                             status_forwards_out <= pipeline_status::BUBBLE;
-                            // wb.cyc <= 1;
-                            // wb.stb <= 1;
+                            wb.cyc <= 1; // -
+                            wb.stb <= 1; // -
                         end
                     end
                 endcase
