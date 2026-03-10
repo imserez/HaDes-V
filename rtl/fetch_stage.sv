@@ -94,6 +94,7 @@ module fetch_stage (
                     STAGE_FETCH: begin
                         if (wb.err == 1) begin
                             status_forwards_out <= pipeline_status::FETCH_FAULT;
+                            program_counter_reg_out <= pc; // added: let other stages know the pc-error
                             wb.cyc <= 0; // re-fetch
                             wb.stb <= 0; // re-fetch
                             curr_fetch_status <= STAGE_ERR;

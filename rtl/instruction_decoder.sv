@@ -12,16 +12,6 @@ module instruction_decoder (
     output instruction::t instruction_out
 );
 
-
-    // opcodes
-
-    // R = 0110011
-    // I = 0010011
-    // S = 0000011
-    // B = 0100011
-    // ....
-
-
     always_comb begin
         instruction_out.op          = op::ILLEGAL;
         instruction_out.rd_address  = 5'b0;
