@@ -28,7 +28,7 @@ module instruction_decoder (
         instruction_out.rs1_address = 5'b0;
         instruction_out.rs2_address = 5'b0;
         instruction_out.immediate   = 32'b0;
-        // instruction_out.csr         = csr::     ;
+        instruction_out.csr         = csr::MSCRATCH;
 
         case (instruction_in[6:0])
 
@@ -37,7 +37,7 @@ module instruction_decoder (
                 instruction_out.rs1_address = instruction_in[19:15];
                 instruction_out.rs2_address = instruction_in[24:20];
                 instruction_out.immediate   = 32'b0;
-                // instruction_out.csr         = csr::     ;
+
 
                 case ({instruction_in[31:25], instruction_in[14:12]})
                     {7'b0000000, 3'b000}: instruction_out.op = op::ADD;
@@ -50,7 +50,6 @@ module instruction_decoder (
                     {7'b0100000, 3'b101}: instruction_out.op = op::SRA;
                     {7'b0000000, 3'b110}: instruction_out.op = op::OR;
                     {7'b0000000, 3'b111}: instruction_out.op = op::AND;
-                    default: instruction_out.op = op::ILLEGAL;
                 endcase
             end
 
@@ -59,7 +58,7 @@ module instruction_decoder (
                 instruction_out.rs1_address = instruction_in[19:15];
                 instruction_out.rs2_address = 0;
                 instruction_out.immediate   = { {20{instruction_in[31]}}, instruction_in[31:20] }; // Sign-extending!!
-                // instruction_out.csr         = csr::     ;
+
 
                 casez ({instruction_in[31:20], instruction_in[14:12]})
                     {12'b????????????, 3'b000}: instruction_out.op = op::ADDI;
@@ -71,7 +70,6 @@ module instruction_decoder (
                     {12'b0000000?????, 3'b001}: instruction_out.op = op::SLLI;
                     {12'b0000000?????, 3'b101}: instruction_out.op = op::SRLI;
                     {12'b0100000?????, 3'b101}: instruction_out.op = op::SRAI;
-                    default: instruction_out.op = op::ILLEGAL;
                 endcase
             end
 
@@ -81,7 +79,7 @@ module instruction_decoder (
                 instruction_out.rs1_address = instruction_in[19:15];
                 instruction_out.rs2_address = 5'b0;
                 instruction_out.immediate   = { {20{instruction_in[31]}}, instruction_in[31:20] };
-                // instruction_out.csr         = csr::     ;
+
 
                 case (instruction_in[14:12])
                     3'b000: instruction_out.op = op::LB;
@@ -89,7 +87,6 @@ module instruction_decoder (
                     3'b010: instruction_out.op = op::LW;
                     3'b100: instruction_out.op = op::LBU;
                     3'b101: instruction_out.op = op::LHU;
-                    default: instruction_out.op = op::ILLEGAL;
                 endcase
             end
 
@@ -98,13 +95,13 @@ module instruction_decoder (
                 instruction_out.rs1_address = instruction_in[19:15];
                 instruction_out.rs2_address = instruction_in[24:20];
                 instruction_out.immediate   = { {20{instruction_in[31]}}, instruction_in[31:25], instruction_in[11:7] };
-                // instruction_out.csr         = csr::     ;
+
 
                 case (instruction_in[14:12])
                     3'b000: instruction_out.op  = op::SB;
                     3'b001: instruction_out.op  = op::SH;
                     3'b010: instruction_out.op  = op::SW;
-                    default: instruction_out.op = op::ILLEGAL;
+
                 endcase
             end
 
@@ -119,7 +116,7 @@ module instruction_decoder (
                     instruction_in[11:8],
                     1'b0
                 };
-                // instruction_out.csr         = csr::     ;
+
 
                 case (instruction_in[14:12])
                     3'b000: instruction_out.op = op::BEQ;
@@ -128,7 +125,7 @@ module instruction_decoder (
                     3'b101: instruction_out.op = op::BGE;
                     3'b110: instruction_out.op = op::BLTU;
                     3'b111: instruction_out.op = op::BGEU;
-                    default: instruction_out.op = op::ILLEGAL;
+
                 endcase
             end
 
@@ -137,13 +134,12 @@ module instruction_decoder (
                 instruction_out.rs1_address = 5'b0;
                 instruction_out.rs2_address = 5'b0;
                 instruction_out.immediate   = {instruction_in[31:12], 12'b0};
-                // instruction_out.csr         = csr::     ;
+
 
                 if (instruction_in[6:0] == 7'b0110111)
                     instruction_out.op = op::LUI;
                 else
                     instruction_out.op = op::AUIPC;
-
             end
 
             7'b1101111: begin // J-TYPE
@@ -157,9 +153,34 @@ module instruction_decoder (
                     instruction_in[30:21],
                     1'b0
                 };
-                // instruction_out.csr         = csr::     ;
+
 
                 instruction_out.op = op::JAL;
+            end
+
+            7'b1100111: begin // JALR
+                instruction_out.rd_address  = instruction_in[11:7];
+                instruction_out.rs1_address = instruction_in[19:15];
+                instruction_out.rs2_address = 5'b0;
+
+                instruction_out.immediate   = { {20{instruction_in[31]}}, instruction_in[31:20] };
+
+                if (instruction_in[14:12] == 3'b000) begin
+                    instruction_out.op = op::JALR;
+                end
+            end
+
+            7'b0001111: begin // MISC-MEM FENCE, FENCE.I
+                instruction_out.rd_address  = instruction_in[11:7];
+                instruction_out.rs1_address = instruction_in[19:15];
+                instruction_out.rs2_address = 5'b0;
+                instruction_out.immediate   = { {20{instruction_in[31]}}, instruction_in[31:20] };
+
+                case (instruction_in[14:12])
+                    3'b000: instruction_out.op = op::FENCE;
+                    3'b001: instruction_out.op = op::FENCE_I;
+
+                endcase
             end
 
             7'b1110011: begin // SYS-TYPE
