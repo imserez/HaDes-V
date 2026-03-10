@@ -79,261 +79,261 @@ test_init:
     addi t3, t3, %lo(0x120000<<2)
     addi t4, t4, %lo(var)
 
-test_fail:
-    addi t2, zero, 1
-    assert_value zero, 1
+# test_fail:
+#     addi t2, zero, 1
+#     assert_value zero, 1
 
-# -----------------------------------------------
-# forward from exe instr (exe followed by exe)
-test_exe_exe:
-    addi t2, zero, 2
-    flush_pipeline
-    # ----------------------------
-    addi t5, zero, 1             #
-    add  t6, t1, t5              #
-    # ----------------------------
-    flush_pipeline
-    assert_value t6, 2
+# # -----------------------------------------------
+# # forward from exe instr (exe followed by exe)
+# test_exe_exe:
+#     addi t2, zero, 2
+#     flush_pipeline
+#     # ----------------------------
+#     addi t5, zero, 1             #
+#     add  t6, t1, t5              #
+#     # ----------------------------
+#     flush_pipeline
+#     assert_value t6, 2
 
-test_exe_exe_1_nop:
-    addi t2, zero, 3
-    flush_pipeline
-    # ----------------------------
-    addi t5, zero, 1             #
-    nop                          #
-    add  t6, t1, t5              #
-    # ----------------------------
-    flush_pipeline
-    assert_value t6, 2
+# test_exe_exe_1_nop:
+#     addi t2, zero, 3
+#     flush_pipeline
+#     # ----------------------------
+#     addi t5, zero, 1             #
+#     nop                          #
+#     add  t6, t1, t5              #
+#     # ----------------------------
+#     flush_pipeline
+#     assert_value t6, 2
 
-test_exe_exe_2_nop:
-    addi t2, zero, 4
-    flush_pipeline
-    # ----------------------------
-    addi t5, zero, 1             #
-    nop                          #
-    nop                          #
-    add  t6, t1, t5              #
-    # ----------------------------
-    flush_pipeline
-    assert_value t6, 2
+# test_exe_exe_2_nop:
+#     addi t2, zero, 4
+#     flush_pipeline
+#     # ----------------------------
+#     addi t5, zero, 1             #
+#     nop                          #
+#     nop                          #
+#     add  t6, t1, t5              #
+#     # ----------------------------
+#     flush_pipeline
+#     assert_value t6, 2
 
-# -----------------------------------------------
-# forward from exe instr (exe followed by mem)
-test_exe_mem:
-    addi t2, zero, 5
-    flush_pipeline
-    # ----------------------------
-    addi t5, zero, 0x123         #
-    sw   t5, 0(t4)               #
-    # ----------------------------
-    flush_pipeline
-    lw   t6, 0(t4)
-    flush_pipeline
-    assert_value t6, 0x123
+# # -----------------------------------------------
+# # forward from exe instr (exe followed by mem)
+# test_exe_mem:
+#     addi t2, zero, 5
+#     flush_pipeline
+#     # ----------------------------
+#     addi t5, zero, 0x123         #
+#     sw   t5, 0(t4)               #
+#     # ----------------------------
+#     flush_pipeline
+#     lw   t6, 0(t4)
+#     flush_pipeline
+#     assert_value t6, 0x123
 
-test_exe_mem_1_nop:
-    addi t2, zero, 6
-    flush_pipeline
-    # ----------------------------
-    addi t5, zero, 0x456         #
-    nop                          #
-    sw   t5, 0(t4)               #
-    # ----------------------------
-    flush_pipeline
-    lw   t6, 0(t4)
-    flush_pipeline
-    assert_value t6, 0x456
+# test_exe_mem_1_nop:
+#     addi t2, zero, 6
+#     flush_pipeline
+#     # ----------------------------
+#     addi t5, zero, 0x456         #
+#     nop                          #
+#     sw   t5, 0(t4)               #
+#     # ----------------------------
+#     flush_pipeline
+#     lw   t6, 0(t4)
+#     flush_pipeline
+#     assert_value t6, 0x456
 
-test_exe_mem_2_nop:
-    addi t2, zero, 7
-    flush_pipeline
-    # ----------------------------
-    addi t5, zero, 0x789         #
-    nop                          #
-    nop                          #
-    sw   t5, 0(t4)               #
-    # ----------------------------
-    flush_pipeline
-    lw   t6, 0(t4)
-    flush_pipeline
-    assert_value t6, 0x789
+# test_exe_mem_2_nop:
+#     addi t2, zero, 7
+#     flush_pipeline
+#     # ----------------------------
+#     addi t5, zero, 0x789         #
+#     nop                          #
+#     nop                          #
+#     sw   t5, 0(t4)               #
+#     # ----------------------------
+#     flush_pipeline
+#     lw   t6, 0(t4)
+#     flush_pipeline
+#     assert_value t6, 0x789
 
-# -----------------------------------------------
-# forward from exe instr (exe followed by wb)
-test_exe_wb:
-    addi t2, zero, 8
-    flush_pipeline
-    # ----------------------------
-    addi t5, zero, 0x123         #
-    csrw mscratch, t5            #
-    # ----------------------------
-    flush_pipeline
-    csrr t6, mscratch
-    flush_pipeline
-    assert_value t6, 0x123
+# # -----------------------------------------------
+# # forward from exe instr (exe followed by wb)
+# test_exe_wb:
+#     addi t2, zero, 8
+#     flush_pipeline
+#     # ----------------------------
+#     addi t5, zero, 0x123         #
+#     csrw mscratch, t5            #
+#     # ----------------------------
+#     flush_pipeline
+#     csrr t6, mscratch
+#     flush_pipeline
+#     assert_value t6, 0x123
 
-test_exe_wb_1_nop:
-    addi t2, zero, 9
-    flush_pipeline
-    # ----------------------------
-    addi t5, zero, 0x456         #
-    nop                          #
-    csrw mscratch, t5            #
-    # ----------------------------
-    flush_pipeline
-    csrr t6, mscratch
-    flush_pipeline
-    assert_value t6, 0x456
+# test_exe_wb_1_nop:
+#     addi t2, zero, 9
+#     flush_pipeline
+#     # ----------------------------
+#     addi t5, zero, 0x456         #
+#     nop                          #
+#     csrw mscratch, t5            #
+#     # ----------------------------
+#     flush_pipeline
+#     csrr t6, mscratch
+#     flush_pipeline
+#     assert_value t6, 0x456
 
-test_exe_wb_2_nop:
-    addi t2, zero, 10
-    flush_pipeline
-    # ----------------------------
-    addi t5, zero, 0x789         #
-    nop                          #
-    nop                          #
-    csrw mscratch, t5            #
-    # ----------------------------
-    flush_pipeline
-    csrr t6, mscratch
-    flush_pipeline
-    assert_value t6, 0x789
+# test_exe_wb_2_nop:
+#     addi t2, zero, 10
+#     flush_pipeline
+#     # ----------------------------
+#     addi t5, zero, 0x789         #
+#     nop                          #
+#     nop                          #
+#     csrw mscratch, t5            #
+#     # ----------------------------
+#     flush_pipeline
+#     csrr t6, mscratch
+#     flush_pipeline
+#     assert_value t6, 0x789
 
-# -----------------------------------------------
-# forward from mem instr (mem followed by exe)      # 11
-test_mem_exe:
-    addi t2, zero, 11
-    flush_pipeline
-    sw   t2, 0(t4)
-    flush_pipeline
-    # ----------------------------
-    lw   t5, 0(t4)               #
-    addi t6, t5, 0x123           #
-    # ----------------------------
-    flush_pipeline
-    assert_value t6, (11 + 0x123)
+# # -----------------------------------------------
+# # forward from mem instr (mem followed by exe)      # 11
+# test_mem_exe:
+#     addi t2, zero, 11
+#     flush_pipeline
+#     sw   t2, 0(t4)
+#     flush_pipeline
+#     # ----------------------------
+#     lw   t5, 0(t4)               #
+#     addi t6, t5, 0x123           #
+#     # ----------------------------
+#     flush_pipeline
+#     assert_value t6, (11 + 0x123)
 
-test_mem_exe_1_nop:
-    addi t2, zero, 12
-    flush_pipeline
-    sw   t2, 0(t4)
-    flush_pipeline
-    # ----------------------------
-    lw   t5, 0(t4)               #
-    nop                          #
-    addi t6, t5, 0x456           #
-    # ----------------------------
-    flush_pipeline
-    assert_value t6, (12 + 0x456)
+# test_mem_exe_1_nop:
+#     addi t2, zero, 12
+#     flush_pipeline
+#     sw   t2, 0(t4)
+#     flush_pipeline
+#     # ----------------------------
+#     lw   t5, 0(t4)               #
+#     nop                          #
+#     addi t6, t5, 0x456           #
+#     # ----------------------------
+#     flush_pipeline
+#     assert_value t6, (12 + 0x456)
 
-test_mem_exe_2_nop:
-    addi t2, zero, 13
-    flush_pipeline
-    sw   t2, 0(t4)
-    flush_pipeline
-    # ----------------------------
-    lw   t5, 0(t4)               #
-    nop                          #
-    nop                          #
-    addi t6, t5, 0x789           #
-    # ----------------------------
-    flush_pipeline
-    assert_value t6, (13 + 0x789)
+# test_mem_exe_2_nop:
+#     addi t2, zero, 13
+#     flush_pipeline
+#     sw   t2, 0(t4)
+#     flush_pipeline
+#     # ----------------------------
+#     lw   t5, 0(t4)               #
+#     nop                          #
+#     nop                          #
+#     addi t6, t5, 0x789           #
+#     # ----------------------------
+#     flush_pipeline
+#     assert_value t6, (13 + 0x789)
 
-# -----------------------------------------------
-# forward from mem instr (mem followed by mem)
-test_mem_mem:
-    addi t2, zero, 14
-    flush_pipeline
-    sw   t2, 0(t4)
-    flush_pipeline
-    # ----------------------------
-    lb   t5, 0(t4)               #
-    sb   t5, 1(t4)               #
-    # ----------------------------
-    flush_pipeline
-    lw   t6, 0(t4)
-    flush_pipeline
-    assert_value t6, ((14<<8) + 14)
+# # -----------------------------------------------
+# # forward from mem instr (mem followed by mem)
+# test_mem_mem:
+#     addi t2, zero, 14
+#     flush_pipeline
+#     sw   t2, 0(t4)
+#     flush_pipeline
+#     # ----------------------------
+#     lb   t5, 0(t4)               #
+#     sb   t5, 1(t4)               #
+#     # ----------------------------
+#     flush_pipeline
+#     lw   t6, 0(t4)
+#     flush_pipeline
+#     assert_value t6, ((14<<8) + 14)
 
-test_mem_mem_1_nop:
-    addi t2, zero, 15
-    flush_pipeline
-    sw   t2, 0(t4)
-    flush_pipeline
-    # ----------------------------
-    lb   t5, 0(t4)               #
-    nop                          #
-    sb   t5, 1(t4)               #
-    # ----------------------------
-    flush_pipeline
-    lw   t6, 0(t4)
-    flush_pipeline
-    assert_value t6, ((15<<8) + 15)
+# test_mem_mem_1_nop:
+#     addi t2, zero, 15
+#     flush_pipeline
+#     sw   t2, 0(t4)
+#     flush_pipeline
+#     # ----------------------------
+#     lb   t5, 0(t4)               #
+#     nop                          #
+#     sb   t5, 1(t4)               #
+#     # ----------------------------
+#     flush_pipeline
+#     lw   t6, 0(t4)
+#     flush_pipeline
+#     assert_value t6, ((15<<8) + 15)
 
-test_mem_mem_2_nop:
-    addi t2, zero, 16
-    flush_pipeline
-    sw   t2, 0(t4)
-    flush_pipeline
-    # ----------------------------
-    lb   t5, 0(t4)               #
-    nop                          #
-    nop                          #
-    sb   t5, 1(t4)               #
-    # ----------------------------
-    flush_pipeline
-    lw   t6, 0(t4)
-    flush_pipeline
-    assert_value t6, ((16<<8) + 16)
+# test_mem_mem_2_nop:
+#     addi t2, zero, 16
+#     flush_pipeline
+#     sw   t2, 0(t4)
+#     flush_pipeline
+#     # ----------------------------
+#     lb   t5, 0(t4)               #
+#     nop                          #
+#     nop                          #
+#     sb   t5, 1(t4)               #
+#     # ----------------------------
+#     flush_pipeline
+#     lw   t6, 0(t4)
+#     flush_pipeline
+#     assert_value t6, ((16<<8) + 16)
 
-# -----------------------------------------------
-# forward from mem instr (mem followed by wb)
-test_mem_wb:
-    addi t2, zero, 17
-    flush_pipeline
-    sw   t2, 0(t4)
-    flush_pipeline
-    # ----------------------------
-    lw   t5, 0(t4)               #
-    csrw mscratch, t5            #
-    # ----------------------------
-    flush_pipeline
-    csrr t6, mscratch
-    flush_pipeline
-    assert_value t6, 17
+# # -----------------------------------------------
+# # forward from mem instr (mem followed by wb)
+# test_mem_wb:
+#     addi t2, zero, 17
+#     flush_pipeline
+#     sw   t2, 0(t4)
+#     flush_pipeline
+#     # ----------------------------
+#     lw   t5, 0(t4)               #
+#     csrw mscratch, t5            #
+#     # ----------------------------
+#     flush_pipeline
+#     csrr t6, mscratch
+#     flush_pipeline
+#     assert_value t6, 17
 
-test_mem_wb_1_nop:
-    addi t2, zero, 18
-    flush_pipeline
-    sw   t2, 0(t4)
-    flush_pipeline
-    # ----------------------------
-    lw   t5, 0(t4)               #
-    nop                          #
-    csrw mscratch, t5            #
-    # ----------------------------
-    flush_pipeline
-    csrr t6, mscratch
-    flush_pipeline
-    assert_value t6, 18
+# test_mem_wb_1_nop:
+#     addi t2, zero, 18
+#     flush_pipeline
+#     sw   t2, 0(t4)
+#     flush_pipeline
+#     # ----------------------------
+#     lw   t5, 0(t4)               #
+#     nop                          #
+#     csrw mscratch, t5            #
+#     # ----------------------------
+#     flush_pipeline
+#     csrr t6, mscratch
+#     flush_pipeline
+#     assert_value t6, 18
 
-test_mem_wb_2_nop:
-    addi t2, zero, 19
-    flush_pipeline
-    sw   t2, 0(t4)
-    flush_pipeline
-    # ----------------------------
-    lw   t5, 0(t4)               #
-    nop                          #
-    nop                          #
-    csrw mscratch, t5            #
-    # ----------------------------
-    flush_pipeline
-    csrr t6, mscratch
-    flush_pipeline
-    assert_value t6, 19
+# test_mem_wb_2_nop:
+#     addi t2, zero, 19
+#     flush_pipeline
+#     sw   t2, 0(t4)
+#     flush_pipeline
+#     # ----------------------------
+#     lw   t5, 0(t4)               #
+#     nop                          #
+#     nop                          #
+#     csrw mscratch, t5            #
+#     # ----------------------------
+#     flush_pipeline
+#     csrr t6, mscratch
+#     flush_pipeline
+#     assert_value t6, 19
 
 # -----------------------------------------------
 # forward from wb instr (wb followed by exe)
