@@ -1,27 +1,3 @@
-# 🚀 HaDes-V: My RISC-V Processor Implementation 
-
-![SystemVerilog](https://img.shields.io/badge/SystemVerilog-005288?style=flat-square&logo=verilog&logoColor=white)
-![Status](https://img.shields.io/badge/Status-Active_Development-orange?style=flat-square)
-
-> **👤 Personal Project Log - Sergi Juárez**
-> 
-> This repository contains my active development of the **HaDes-V** processor core. I am building this 32-bit pipelined RISC-V (RV32I) CPU from scratch using SystemVerilog, following the modular architecture provided by the Graz University of Technology (see original OER details below).
->
-> My goal with this project is to deeply understand **CPU architecture, hardware description languages (RTL), and the hardware/software boundary**.
->
-> ### 🛠️ My Implementation Progress
-> *Below is the live status of the modules I am actively writing in the `rtl/` directory:*
->
-> - [x] **Top-Level CPU Wrapper (`cpu.sv`):** Setting up the main processor module, interface definitions, and signal routing. *(Currently working on this)*
-> - [🚧] **Instruction Fetch (IF) Stage:** Implementing Program Counter (PC) logic and Instruction Memory interfacing.
-> - [ ] **Instruction Decode (ID) Stage:** Register File implementation and Control Unit instruction decoding.
-> - [ ] **Execution (EX) Stage & ALU:** Arithmetic/Logic operations (ADD, SUB, Shifts) and branch resolution.
-> - [ ] **Memory (MEM) & Writeback (WB) Stages:** Data memory interfacing and register writeback logic.
-> - [ ] **Testbench & Verification:** Full pipeline validation using Verilator and GTKWave.
->
-
----
-
 *(Original Project README from Graz University of Technology below)*
 
 [instrguide]:https://repository.tugraz.at/oer/nytm4-grv34
