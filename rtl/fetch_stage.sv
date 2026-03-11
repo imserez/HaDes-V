@@ -52,14 +52,17 @@ module fetch_stage (
     assign  wb.we = 0;
     assign  wb.sel = 4'b1111;
 
+    assign wb.cyc = (curr_fetch_status != STAGE_ERR);
+    assign wb.stb = (curr_fetch_status != STAGE_ERR);
+
     always_ff @(posedge clk) begin
 
         if (rst) begin
             // curr_fetch_status <= STAGE_START;
             curr_fetch_status <= STAGE_FETCH;
 
-            wb.cyc <= 1;
-            wb.stb <= 1;
+            // wb.cyc <= 1;
+            // wb.stb <= 1;
             pc <= constants::RESET_ADDRESS;
             program_counter_reg_out <= 0;
             status_forwards_out <= pipeline_status::BUBBLE;
@@ -75,6 +78,7 @@ module fetch_stage (
                 // wb.cyc <= 0; // re-fetch
                 // wb.stb <= 0; // re-fetch
                 pc <= jump_address_backwards_in;
+                // program_counter_reg_out <= jump_address_backwards_in;
 
                 if (jump_address_backwards_in[1:0] & 2'b11) begin // MISALIGNED!! is 0 = false, that's why.
                     status_forwards_out <= pipeline_status::FETCH_MISALIGNED;
@@ -82,9 +86,8 @@ module fetch_stage (
                 end
                 else begin
                     status_forwards_out <= pipeline_status::BUBBLE;
-                    curr_fetch_status <= STAGE_START;
+                    curr_fetch_status <= STAGE_FETCH;
                 end
-
             end
             else begin
                 case (curr_fetch_status)

@@ -99,7 +99,7 @@ module test_fetch;
         // check_fetch(constants::RESET_ADDRESS, 0, fetch_status::STAGE_FETCH);
         @(posedge clk); #1;
 
-        // wait(dut_memory_fetch_port.ack == 1);
+        wait(dut_memory_fetch_port.ack == 1);
         @(posedge clk); #1;
         // check_fetch(constants::RESET_ADDRESS, constants::RESET_ADDRESS, fetch_status::STAGE_HOLD);
 
@@ -114,11 +114,17 @@ module test_fetch;
 
         repeat(4) @(posedge clk);
 
+        tb_status_backwards_in = pipeline_status::READY;
         tb_status_backwards_in = pipeline_status::JUMP;
         tb_jump_address_backwards_in = 31'h0012_0000;
         @(posedge clk);
-        tb_jump_address_backwards_in = 31'h0000_0000;
+        tb_status_backwards_in = pipeline_status::JUMP;
+        tb_jump_address_backwards_in = 31'h0016_0000;
+        @(posedge clk);
         tb_status_backwards_in = pipeline_status::READY;
+        @(posedge clk);
+
+        tb_jump_address_backwards_in = 31'h0000_0000;
 
         repeat(10) @(posedge clk);
 
