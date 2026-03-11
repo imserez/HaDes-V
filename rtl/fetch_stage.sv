@@ -52,8 +52,8 @@ module fetch_stage (
     assign  wb.we = 0;
     assign  wb.sel = 4'b1111;
 
-    assign wb.cyc = (curr_fetch_status != STAGE_ERR);
-    assign wb.stb = (curr_fetch_status != STAGE_ERR);
+    assign wb.cyc = 1;
+    assign wb.stb = 1;
 
     always_ff @(posedge clk) begin
 
@@ -115,7 +115,7 @@ module fetch_stage (
                             status_forwards_out <= pipeline_status::BUBBLE;
 
                             if (status_backwards_in == pipeline_status::READY) begin
-                                curr_fetch_status <= STAGE_ERR;
+                                // curr_fetch_status <= STAGE_ERR;
                                 program_counter_reg_out <= pc;
                                 instruction_reg_out <= wb.dat_miso;
                                 status_forwards_out <= pipeline_status::FETCH_FAULT;

@@ -179,7 +179,9 @@ module instruction_decoder (
                 instruction_out.rs2_address = 5'b0;
                 instruction_out.immediate   = { 27'b0, instruction_in[19:15] };
 
-                if (instruction_in[19:7] == 13'b0) begin // this already includes func3 3'b000 !!
+                // if (instruction_in[19:7] == 13'b0) begin // this already includes func3 3'b000 !!
+
+                if (instruction_in[14:12] == 13'b0) begin // less restrictive, just func3
                     case (instruction_in[31:20])
                         12'b000000000000: instruction_out.op = op::ECALL;
                         12'b000000000001: instruction_out.op = op::EBREAK;

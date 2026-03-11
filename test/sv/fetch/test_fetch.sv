@@ -72,12 +72,17 @@ module test_fetch;
         .jump_address_backwards_in(tb_jump_address_backwards_in)
     );
 
+
+    logic tb_wb_err = 0;
+
     dummy_memory dut_mem(.clk(clk),
-        .wb(dut_memory_fetch_port.slave)
+        .wb(dut_memory_fetch_port.slave),
+        .err(tb_wb_err)
     );
 
     dummy_memory ref_mem(.clk(clk),
-        .wb(ref_memory_fetch_port.slave)
+        .wb(ref_memory_fetch_port.slave),
+        .err(tb_wb_err)
     );
 
 
@@ -111,9 +116,13 @@ module test_fetch;
 
 
         repeat(4) @(posedge clk);
-
+        tb_wb_err = 1;
+        @(posedge clk);
+        tb_wb_err = 0;
         repeat(4) @(posedge clk);
-
+        tb_wb_err = 1;
+        repeat(2) @(posedge clk);
+        tb_wb_err = 0;
         tb_status_backwards_in = pipeline_status::READY;
         tb_status_backwards_in = pipeline_status::JUMP;
         tb_jump_address_backwards_in = 31'h0012_0000;
