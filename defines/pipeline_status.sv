@@ -50,8 +50,7 @@ package decode_status;
         STAGE_START,
         STAGE_WAIT,
         STAGE_DECODE,
-        STAGE_HOLD,
-        STAGE_ERR
+        STAGE_HOLD
   } decode_state_t;
 
 endpackage

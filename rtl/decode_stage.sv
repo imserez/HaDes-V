@@ -34,33 +34,46 @@ module decode_stage (
 );
 
     import decode_status::*;
+    // import pipeline_status::*;
 
     instruction::t  decoded_instruction;
 
     instruction_decoder decoder (
-        .instruction_in(instruction_in),
+        .instruction_in(instruction_in),        // directly from fetch
         .instruction_out(decoded_instruction)
     );
+
+    logic [31:0] rf_read_data1;
+    logic [31:0] rf_read_data2;
 
     register_file   reg_file (
         .clk(clk),
         .rst(rst),
-        .read_address1(decoded_instruction.rs1_address),
-        .read_data1(rs1_data_reg_out),
+        .read_address1(decoded_instruction.rs1_address), // directly from fetch
+        .read_data1(rf_read_data1),
         .read_address2(decoded_instruction.rs2_address),
-        .read_data2(rs2_data_reg_out),
-        .write_address(decoded_instruction.rd_address),
-        .write_data(0),
-        .write_enable(0)
+        .read_data2(rf_read_data2),
+        .write_address(wb_forwarding_in.address), // usage of WB forwarding
+        .write_data(wb_forwarding_in.data),
+        .write_enable(wb_forwarding_in.data_valid)
     );
+
+
+    decode_state_t curr_dec_status;
+
 
     // Forwards
     // assign jump_address_backwards_out   = jump_address_backwards_in;
 
     // Backwards
-    assign jump_address_backwards_out = jump_address_backwards_in
+    assign jump_address_backwards_out = jump_address_backwards_in;
 
+    logic [31:0] selected_rs1_data;
+    logic [31:0] selected_rs2_data;
 
+    assign selected_rs1_data = (decoded_instruction.rs1_address == wb_forwarding_in.address) ? wb_forwarding_in.data : rf_read_data1;
+
+    assign selected_rs2_data = (decoded_instruction.rs2_address == wb_forwarding_in.address) ? wb_forwarding_in.data : rf_read_data2;
 
     always_ff @(posedge clk) begin
 
@@ -76,21 +89,24 @@ module decode_stage (
             // ----------
             curr_dec_status <= STAGE_WAIT;
         end
+        if (status_backwards_in == pipeline_status::JUMP) begin
+            status_backwards_out <= pipeline_status::JUMP;
+        end
         else begin
             case (curr_dec_status)
-
                 STAGE_WAIT: begin
                     status_backwards_out <= pipeline_status::READY;
+
                     if (status_forwards_in == pipeline_status::VALID) begin
                         program_counter_reg_out <= program_counter_in;
                         instruction_reg_out <= decoded_instruction;
+                        rs1_data_reg_out <= selected_rs1_data;
+                        rs2_data_reg_out <= selected_rs2_data;
                     end
                 end
             endcase
 
         end
-
-
     end
 
 
