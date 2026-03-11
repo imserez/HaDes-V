@@ -79,7 +79,7 @@ module decode_stage (
     always_comb begin
         // EXE -> MEM -> WB !!!
         // inverted order, so the last one wins.
-        selected_rs2_data = rf_read_data2;
+        selected_rs1_data = rf_read_data1;
         selected_rs2_data = rf_read_data2;
 
 
@@ -92,7 +92,8 @@ module decode_stage (
                 selected_rs2_data = wb_forwarding_in.data;
             end
         end
-        else if (mem_forwarding_in.data_valid) begin
+
+        if (mem_forwarding_in.data_valid) begin
             if (decoded_instruction.rs1_address == mem_forwarding_in.address) begin
                 selected_rs1_data = mem_forwarding_in.data;
             end
@@ -101,7 +102,8 @@ module decode_stage (
                 selected_rs2_data = mem_forwarding_in.data;
             end
         end
-        else if (exe_forwarding_in.data_valid) begin
+
+        if (exe_forwarding_in.data_valid) begin
             if (decoded_instruction.rs1_address == exe_forwarding_in.address) begin
                 selected_rs1_data = exe_forwarding_in.data;
             end
@@ -109,6 +111,13 @@ module decode_stage (
             if (decoded_instruction.rs2_address == exe_forwarding_in.address) begin
                 selected_rs2_data = exe_forwarding_in.data;
             end
+        end
+
+        if (decoded_instruction.rs1_address == 5'b0) begin
+            selected_rs1_data = 32'b0;
+        end
+        if (decoded_instruction.rs2_address == 5'b0) begin
+            selected_rs2_data = 32'b0;
         end
     end
 
