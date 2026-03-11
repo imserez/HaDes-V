@@ -97,7 +97,8 @@ module fetch_stage (
             else begin
                 case (curr_fetch_status)
                     STAGE_ERR: begin
-                        status_forwards_out <= pipeline_status::BUBBLE;
+                        status_forwards_out <= pipeline_status::FETCH_FAULT;
+
                     end
                     STAGE_START: begin
                         // wb.cyc <= 1;
@@ -111,11 +112,15 @@ module fetch_stage (
                     // end
                     STAGE_FETCH: begin
                         if (wb.err == 1) begin
-                            status_forwards_out <= pipeline_status::FETCH_FAULT;
-                            program_counter_reg_out <= pc; // added: let other stages know the pc-error
-                            // wb.cyc <= 0; // re-fetch
-                            // wb.stb <= 0; // re-fetch
-                            curr_fetch_status <= STAGE_ERR;
+                            status_forwards_out <= pipeline_status::BUBBLE;
+
+                            if (status_backwards_in == pipeline_status::READY) begin
+                                curr_fetch_status <= STAGE_ERR;
+                                program_counter_reg_out <= pc;
+                                instruction_reg_out <= wb.dat_miso;
+                                status_forwards_out <= pipeline_status::FETCH_FAULT;
+
+                            end
                         end
                         else if (wb.ack == 1) begin
 

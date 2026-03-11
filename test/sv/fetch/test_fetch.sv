@@ -99,7 +99,7 @@ module test_fetch;
         // check_fetch(constants::RESET_ADDRESS, 0, fetch_status::STAGE_FETCH);
         @(posedge clk); #1;
 
-        wait(dut_memory_fetch_port.ack == 1);
+        // wait(dut_memory_fetch_port.ack == 1);
         @(posedge clk); #1;
         // check_fetch(constants::RESET_ADDRESS, constants::RESET_ADDRESS, fetch_status::STAGE_HOLD);
 
