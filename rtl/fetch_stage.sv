@@ -94,6 +94,9 @@ module fetch_stage (
                     curr_fetch_status <= STAGE_FETCH;
                 end
             end
+            // else if (status_backwards_in == pipeline_status::STALL) begin
+
+            // end
             else begin
                 case (curr_fetch_status)
                     STAGE_ERR: begin

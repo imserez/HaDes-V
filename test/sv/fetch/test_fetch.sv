@@ -120,6 +120,7 @@ module test_fetch;
         @(posedge clk);
         tb_wb_err = 0;
         repeat(4) @(posedge clk);
+        tb_status_backwards_in = pipeline_status::STALL;
         tb_wb_err = 1;
         repeat(2) @(posedge clk);
         tb_wb_err = 0;
