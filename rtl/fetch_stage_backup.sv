@@ -57,18 +57,6 @@ module fetch_stage (
 
     always_ff @(posedge clk) begin
 
-        if (wb.ack == 1) begin
-            instruction_reg_out <= wb.dat_miso;
-        end
-
-        if (status_backwards_in == pipeline_status::JUMP) begin
-            program_counter_reg_out <= jump_address_backwards_in;
-        end
-        else if (wb.ack == 1) begin
-            program_counter_reg_out <= pc;
-        end
-
-
         if (rst) begin
             // curr_fetch_status <= STAGE_START;
             curr_fetch_status <= STAGE_FETCH;
@@ -122,7 +110,7 @@ module fetch_stage (
                     STAGE_FETCH: begin
                         if (wb.err == 1) begin
                             status_forwards_out <= pipeline_status::FETCH_FAULT;
-                            // program_counter_reg_out <= pc; // added: let other stages know the pc-error
+                            program_counter_reg_out <= pc; // added: let other stages know the pc-error
                             // wb.cyc <= 0; // re-fetch
                             // wb.stb <= 0; // re-fetch
                             curr_fetch_status <= STAGE_ERR;
@@ -131,8 +119,8 @@ module fetch_stage (
 
                             if (status_backwards_in == pipeline_status::READY) begin
 
-                                // instruction_reg_out <= wb.dat_miso; //-
-                                // program_counter_reg_out <= pc; // -
+                                instruction_reg_out <= wb.dat_miso; //-
+                                program_counter_reg_out <= pc; // -
 
 
                                 curr_fetch_status <= STAGE_FETCH;
