@@ -35,18 +35,31 @@ module decode_stage (
 
     import decode_status::*;
 
-    instruction_decoder decoder (.instruction_in(instruction_in),);
-
-    decode_state_t curr_dec_status = STAGE_DECODE;
-
     instruction::t  decoded_instruction;
 
+    instruction_decoder decoder (
+        .instruction_in(instruction_in),
+        .instruction_out(decoded_instruction)
+    );
+
+    register_file   reg_file (
+        .clk(clk),
+        .rst(rst),
+        .read_address1(decoded_instruction.rs1_address),
+        .read_data1(rs1_data_reg_out),
+        .read_address2(decoded_instruction.rs2_address),
+        .read_data2(rs2_data_reg_out),
+        .write_address(decoded_instruction.rd_address),
+        .write_data(0),
+        .write_enable(0)
+    );
 
     // Forwards
     // assign jump_address_backwards_out   = jump_address_backwards_in;
 
     // Backwards
     assign jump_address_backwards_out = jump_address_backwards_in
+
 
 
     always_ff @(posedge clk) begin
@@ -69,7 +82,8 @@ module decode_stage (
                 STAGE_WAIT: begin
                     status_backwards_out <= pipeline_status::READY;
                     if (status_forwards_in == pipeline_status::VALID) begin
-
+                        program_counter_reg_out <= program_counter_in;
+                        instruction_reg_out <= decoded_instruction;
                     end
                 end
             endcase
