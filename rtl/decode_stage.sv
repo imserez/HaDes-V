@@ -78,28 +78,12 @@ module decode_stage (
 
     always_comb begin
         // EXE -> MEM -> WB !!!
+        // inverted order, so the last one wins.
         selected_rs2_data = rf_read_data2;
         selected_rs2_data = rf_read_data2;
 
-        if (exe_forwarding_in.data_valid) begin
-            if (decoded_instruction.rs1_address == exe_forwarding_in.address) begin
-                selected_rs1_data = exe_forwarding_in.data;
-            end
 
-            if (decoded_instruction.rs2_address == exe_forwarding_in.address) begin
-                selected_rs2_data = exe_forwarding_in.data;
-            end
-        end
-        if (mem_forwarding_in.data_valid) begin
-            if (decoded_instruction.rs1_address == mem_forwarding_in.address) begin
-                selected_rs1_data = mem_forwarding_in.data;
-            end
-
-            if (decoded_instruction.rs2_address == mem_forwarding_in.address) begin
-                selected_rs2_data = mem_forwarding_in.data;
-            end
-        end
-        else if (wb_forwarding_in.data_valid) begin
+        if (wb_forwarding_in.data_valid) begin
             if (decoded_instruction.rs1_address == wb_forwarding_in.address) begin
                 selected_rs1_data = wb_forwarding_in.data;
             end
@@ -108,7 +92,24 @@ module decode_stage (
                 selected_rs2_data = wb_forwarding_in.data;
             end
         end
+        else if (mem_forwarding_in.data_valid) begin
+            if (decoded_instruction.rs1_address == mem_forwarding_in.address) begin
+                selected_rs1_data = mem_forwarding_in.data;
+            end
 
+            if (decoded_instruction.rs2_address == mem_forwarding_in.address) begin
+                selected_rs2_data = mem_forwarding_in.data;
+            end
+        end
+        else if (exe_forwarding_in.data_valid) begin
+            if (decoded_instruction.rs1_address == exe_forwarding_in.address) begin
+                selected_rs1_data = exe_forwarding_in.data;
+            end
+
+            if (decoded_instruction.rs2_address == exe_forwarding_in.address) begin
+                selected_rs2_data = exe_forwarding_in.data;
+            end
+        end
     end
 
 
