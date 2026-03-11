@@ -76,12 +76,14 @@ module decode_stage (
     assign selected_rs2_data = (decoded_instruction.rs2_address == wb_forwarding_in.address) ? wb_forwarding_in.data : rf_read_data2;
 
 
+    logic stall;
+
     always_comb begin
         // EXE -> MEM -> WB !!!
         // inverted order, so the last one wins.
         selected_rs1_data = rf_read_data1;
         selected_rs2_data = rf_read_data2;
-
+        stall = 1'b0;
 
         if (wb_forwarding_in.data_valid) begin
             if (decoded_instruction.rs1_address == wb_forwarding_in.address) begin
@@ -119,6 +121,22 @@ module decode_stage (
         if (decoded_instruction.rs2_address == 5'b0) begin
             selected_rs2_data = 32'b0;
         end
+
+        // HAZARD DETECTION
+
+        if (exe_forwarding_in.address == decoded_instruction.rs1_address
+            && exe_forwarding_in.address != 5'd0
+            && exe_forwarding_in.data_valid == 1'b0)
+        begin
+            stall = 1'b1;
+        end
+
+        if (exe_forwarding_in.address == decoded_instruction.rs2_address
+            && exe_forwarding_in.address != 5'd0
+            && exe_forwarding_in.data_valid == 1'b0)
+        begin
+            stall = 1'b1;
+        end
     end
 
 
@@ -143,13 +161,20 @@ module decode_stage (
         else begin
             case (curr_dec_status)
                 STAGE_WAIT: begin
-                    status_backwards_out <= pipeline_status::READY;
 
-                    if (status_forwards_in == pipeline_status::VALID) begin
-                        program_counter_reg_out <= program_counter_in;
-                        instruction_reg_out <= decoded_instruction;
-                        rs1_data_reg_out <= selected_rs1_data;
-                        rs2_data_reg_out <= selected_rs2_data;
+                    if (stall) begin
+                        status_backwards_out <= pipeline_status::STALL;
+                        status_forwards_out <= pipeline_status::BUBBLE;
+                    end
+                    else begin
+                        status_backwards_out <= pipeline_status::READY;
+                        status_forwards_out <= pipeline_status::BUBBLE;
+                        if (status_forwards_in == pipeline_status::VALID) begin
+                            program_counter_reg_out <= program_counter_in;
+                            instruction_reg_out <= decoded_instruction;
+                            rs1_data_reg_out <= selected_rs1_data;
+                            rs2_data_reg_out <= selected_rs2_data;
+                        end
                     end
                 end
             endcase
