@@ -71,9 +71,9 @@ module decode_stage (
     logic [31:0] selected_rs1_data;
     logic [31:0] selected_rs2_data;
 
-    assign selected_rs1_data = (decoded_instruction.rs1_address == wb_forwarding_in.address) ? wb_forwarding_in.data : rf_read_data1;
+    // assign selected_rs1_data = (decoded_instruction.rs1_address == wb_forwarding_in.address) ? wb_forwarding_in.data : rf_read_data1;
 
-    assign selected_rs2_data = (decoded_instruction.rs2_address == wb_forwarding_in.address) ? wb_forwarding_in.data : rf_read_data2;
+    // assign selected_rs2_data = (decoded_instruction.rs2_address == wb_forwarding_in.address) ? wb_forwarding_in.data : rf_read_data2;
 
 
     logic stall;
@@ -168,7 +168,17 @@ module decode_stage (
                     end
                     else begin
                         status_backwards_out <= pipeline_status::READY;
-                        status_forwards_out <= pipeline_status::BUBBLE;
+
+                        if (decoded_instruction.op == op::ILLEGAL) begin
+                            status_forwards_out <= pipeline_status::ILLEGAL_INSTRUCTION;
+                        end
+                        else if (status_backwards_in == pipeline_status::BUBBLE)begin
+                            status_forwards_out <= pipeline_status::BUBBLE;
+                        end
+                        else begin
+                            status_forwards_out <= pipeline_status::VALID;
+                        end
+
                         if (status_forwards_in == pipeline_status::VALID) begin
                             program_counter_reg_out <= program_counter_in;
                             instruction_reg_out <= decoded_instruction;
