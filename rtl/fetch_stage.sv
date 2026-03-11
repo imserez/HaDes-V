@@ -147,6 +147,7 @@ module fetch_stage (
                         else if (status_backwards_in == pipeline_status::READY) begin // -
                             status_forwards_out <= pipeline_status::BUBBLE;
                             program_counter_reg_out <= pc;
+                            instruction_reg_out <= wb.dat_miso;
                         end
                     end
                     // STAGE_HOLD: begin

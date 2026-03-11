@@ -127,9 +127,13 @@ module test_fetch;
         tb_status_backwards_in = pipeline_status::JUMP;
         tb_jump_address_backwards_in = 31'h0012_0000;
         @(posedge clk);
-        tb_status_backwards_in = pipeline_status::JUMP;
-        tb_jump_address_backwards_in = 31'h0016_0000;
-        @(posedge clk);
+        tb_status_backwards_in = pipeline_status::STALL;
+        // tb_jump_address_backwards_in = 31'h0016_0000;
+        repeat(2) @(posedge clk);
+        tb_wb_err = 1;
+        repeat(2) @(posedge clk);
+        tb_wb_err = 0;
+        repeat(2) @(posedge clk);
         tb_status_backwards_in = pipeline_status::READY;
         @(posedge clk);
 
