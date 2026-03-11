@@ -81,8 +81,8 @@ module fetch_stage (
                 program_counter_reg_out <= pc;
                 // program_counter_reg_out <= jump_address_backwards_in;
 
-                if (wb.ack == 1) begin
                     instruction_reg_out <= wb.dat_miso;
+                if (wb.ack == 1) begin
                 end
 
                 if (jump_address_backwards_in[1:0] & 2'b11) begin // MISALIGNED!! is 0 = false, that's why.
