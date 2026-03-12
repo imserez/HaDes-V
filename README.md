@@ -3,7 +3,7 @@
 
 - [x] **Top-Level CPU Wrapper (`cpu.sv`):** Setting up the main processor module, interface definitions, and signal routing. *(Currently working on this)*
 - [x] **Instruction Fetch (IF) Stage:** Implementing Program Counter (PC) logic and Instruction Memory interfacing.
-- [W] **Instruction Decode (ID) Stage:** Register File implementation and Control Unit instruction decoding.
+- [ ] **Instruction Decode (ID) Stage:** Register File implementation and Control Unit instruction decoding.
 - [ ] **Execution (EX) Stage & ALU:** Arithmetic/Logic operations (ADD, SUB, Shifts) and branch resolution.
 - [ ] **Memory (MEM) & Writeback (WB) Stages:** Data memory interfacing and register writeback logic.
 - [ ] **Testbench & Verification:** Full pipeline validation using Verilator and GTKWave.
