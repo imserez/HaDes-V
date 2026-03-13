@@ -175,43 +175,39 @@ module decode_stage (
         else if (status_backwards_in == pipeline_status::STALL) begin
         end
         else begin
-            case (curr_dec_status)
-                STAGE_WAIT: begin
 
-                    if (stall) begin
+            if (stall) begin
+                status_forwards_out <= pipeline_status::BUBBLE;
+            end
+            else begin
+                program_counter_reg_out <= program_counter_in;
+
+                if (status_forwards_in == pipeline_status::VALID) begin
+
+                    if (decoded_instruction.op == op::ILLEGAL) begin
+                        status_forwards_out <= pipeline_status::ILLEGAL_INSTRUCTION;
+                    end
+                    else if (decoded_instruction.op == op::ECALL) begin
+                        status_forwards_out <= pipeline_status::ECALL;
+                    end
+                    else if (decoded_instruction.op == op::EBREAK) begin
+                        status_forwards_out <= pipeline_status::EBREAK;
+                    end
+                    else if (status_forwards_in == pipeline_status::BUBBLE)begin
                         status_forwards_out <= pipeline_status::BUBBLE;
                     end
                     else begin
-                        program_counter_reg_out <= program_counter_in;
-
-                        if (status_forwards_in == pipeline_status::VALID) begin
-                            if (decoded_instruction.op == op::ILLEGAL) begin
-                                status_forwards_out <= pipeline_status::ILLEGAL_INSTRUCTION;
-                            end
-                            else if (decoded_instruction.op == op::ECALL) begin
-                                status_forwards_out <= pipeline_status::ECALL;
-                            end
-                            else if (decoded_instruction.op == op::EBREAK) begin
-                                status_forwards_out <= pipeline_status::EBREAK;
-                            end
-                            else if (status_forwards_in == pipeline_status::BUBBLE)begin
-                                status_forwards_out <= pipeline_status::BUBBLE;
-                            end
-                            else begin
-                                status_forwards_out <= pipeline_status::VALID;
-                            end
-
-                            instruction_reg_out <= decoded_instruction;
-                            rs1_data_reg_out <= selected_rs1_data;
-                            rs2_data_reg_out <= selected_rs2_data;
-                        end
-                        else begin
-                            status_forwards_out <= status_forwards_in;
-                        end
+                        status_forwards_out <= pipeline_status::VALID;
                     end
-                end
-            endcase
 
+                    instruction_reg_out <= decoded_instruction;
+                    rs1_data_reg_out <= selected_rs1_data;
+                    rs2_data_reg_out <= selected_rs2_data;
+                end
+                else begin
+                    status_forwards_out <= status_forwards_in;
+                end
+            end
         end
     end
 
