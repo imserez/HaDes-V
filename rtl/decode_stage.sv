@@ -172,7 +172,13 @@ module decode_stage (
                         if (decoded_instruction.op == op::ILLEGAL) begin
                             status_forwards_out <= pipeline_status::ILLEGAL_INSTRUCTION;
                         end
-                        else if (status_backwards_in == pipeline_status::BUBBLE)begin
+                        else if (decoded_instruction.op == op::ECALL) begin
+                            status_forwards_out <= pipeline_status::ECALL;
+                        end
+                        else if (decoded_instruction.op == op::EBREAK) begin
+                            status_forwards_out <= pipeline_status::EBREAK;
+                        end
+                        else if (status_forwards_in == pipeline_status::BUBBLE)begin
                             status_forwards_out <= pipeline_status::BUBBLE;
                         end
                         else begin
