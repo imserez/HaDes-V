@@ -33,7 +33,7 @@ DEFINES_DIR = defines
 TEST_DIR = test
 ASM_DIR = $(TEST_DIR)/asm
 C_DIR = $(TEST_DIR)/c
-SV_DIR = $(TEST_DIR)/sv/fetch
+SV_DIR = $(TEST_DIR)/sv/decode
 
 # Verilator Flags
 VERILATOR_FLAGS =
