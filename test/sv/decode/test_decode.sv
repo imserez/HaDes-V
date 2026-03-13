@@ -28,13 +28,6 @@ module test_decode;
     end
 
     // device under test
-    forwarding::t tb_exe_forwarding_in;
-    forwarding::t tb_mem_forwarding_in;
-    forwarding::t tb_wb_forwarding_in;
-    pipeline_status::backwards_t tb_status_backwards_in;
-    logic [31:0] tb_jump_address_backwards_in;
-
-
     logic [31:0]   dut_rs1_data_reg_out;
     logic [31:0]   dut_rs2_data_reg_out;
     logic [31:0]   dut_program_counter_reg_out;
@@ -43,6 +36,22 @@ module test_decode;
     pipeline_status::forwards_t  dut_status_forwards_out;
     pipeline_status::backwards_t dut_status_backwards_out;
     logic [31:0] dut_jump_address_backwards_out;
+
+    // tb
+    forwarding::t tb_exe_forwarding_in;
+    forwarding::t tb_mem_forwarding_in;
+    forwarding::t tb_wb_forwarding_in;
+    pipeline_status::backwards_t tb_status_backwards_in;
+    logic [31:0] tb_jump_address_backwards_in;
+
+    // ref
+    logic [31:0]   ref_rs2_data_reg_out;
+    logic [31:0]   ref_program_counter_reg_out;
+    instruction::t ref_instruction_reg_out;
+
+    pipeline_status::forwards_t  ref_status_forwards_out;
+    pipeline_status::backwards_t ref_status_backwards_out;
+    logic [31:0] ref_jump_address_backwards_out;
 
 
     // Fetch_stage
@@ -79,6 +88,27 @@ module test_decode;
         .jump_address_backwards_in(tb_jump_address_backwards_in),
         .jump_address_backwards_out(dut_jump_address_backwards_out)
     );
+
+    ref_decode_stage ref_decode_stage (
+        .clk(clk),
+        .rst(rst),
+        .instruction_in(fetch_instruction_reg_out),
+        .program_counter_in(fetch_program_counter_reg_out),
+        .exe_forwarding_in(tb_exe_forwarding_in),
+        .mem_forwarding_in(tb_mem_forwarding_in),
+        .wb_forwarding_in(tb_wb_forwarding_in),
+        .rs1_data_reg_out(ref_rs1_data_reg_out),
+        .rs2_data_reg_out(ref_rs2_data_reg_out),
+        .program_counter_reg_out(ref_program_counter_reg_out),
+        .instruction_reg_out(ref_instruction_reg_out),
+        .status_forwards_in(fetch_status_forwards_out),
+        .status_forwards_out(ref_status_forwards_out),
+        .status_backwards_in(tb_status_backwards_in),
+        .status_backwards_out(ref_status_backwards_out),
+        .jump_address_backwards_in(tb_jump_address_backwards_in),
+        .jump_address_backwards_out(ref_jump_address_backwards_out)
+    );
+
 
     // using my fetch-stage
     fetch_stage fetch_stage (
