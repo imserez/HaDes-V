@@ -149,7 +149,7 @@ module test_decode;
 
         perform_reset();
 
-        repeat(5) @(posedge clk);
+        repeat(50) @(posedge clk);
 
 
         print_test_done();
