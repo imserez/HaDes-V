@@ -162,13 +162,15 @@ module decode_stage (
             instruction_reg_out <= 0;
             program_counter_reg_out <= 0;
             // Pipeline Control
-            // status_backwards_out <= pipeline_status::READY;
             status_forwards_out <= pipeline_status::BUBBLE;
             // ----------
             curr_dec_status <= STAGE_WAIT;
         end
         if (status_backwards_in == pipeline_status::JUMP) begin
-            // status_backwards_out <= pipeline_status::JUMP;
+            status_forwards_out <= pipeline_status::BUBBLE;
+        end
+        else if (status_backwards_in == pipeline_status::STALL) begin
+
         end
         else begin
             case (curr_dec_status)
