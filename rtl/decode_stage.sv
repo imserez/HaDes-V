@@ -182,6 +182,8 @@ module decode_stage (
                         status_forwards_out <= pipeline_status::BUBBLE;
                     end
                     else begin
+                        program_counter_reg_out <= program_counter_in;
+
                         if (status_forwards_in == pipeline_status::VALID) begin
                             if (decoded_instruction.op == op::ILLEGAL) begin
                                 status_forwards_out <= pipeline_status::ILLEGAL_INSTRUCTION;
@@ -199,7 +201,6 @@ module decode_stage (
                                 status_forwards_out <= pipeline_status::VALID;
                             end
 
-                            program_counter_reg_out <= program_counter_in;
                             instruction_reg_out <= decoded_instruction;
                             rs1_data_reg_out <= selected_rs1_data;
                             rs2_data_reg_out <= selected_rs2_data;
